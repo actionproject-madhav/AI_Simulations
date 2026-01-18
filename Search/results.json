@@ -1,0 +1,150 @@
+{
+  "n_queens": [
+    {
+      "n": 3,
+      "bfs_created": 6,
+      "bfs_expanded": 6,
+      "bfs_time": 2.4080276489257812e-05,
+      "ids_created": 17,
+      "ids_expanded": 11,
+      "ids_time": 1.6927719116210938e-05
+    },
+    {
+      "n": 4,
+      "bfs_created": 17,
+      "bfs_expanded": 16,
+      "bfs_time": 1.5020370483398438e-05,
+      "ids_created": 43,
+      "ids_expanded": 25,
+      "ids_time": 2.7179718017578125e-05
+    },
+    {
+      "n": 5,
+      "bfs_created": 54,
+      "bfs_expanded": 45,
+      "bfs_time": 4.9114227294921875e-05,
+      "ids_created": 113,
+      "ids_expanded": 62,
+      "ids_time": 7.200241088867188e-05
+    },
+    {
+      "n": 6,
+      "bfs_created": 153,
+      "bfs_expanded": 150,
+      "bfs_time": 0.00018978118896484375,
+      "ids_created": 396,
+      "ids_expanded": 238,
+      "ids_time": 0.0003180503845214844
+    },
+    {
+      "n": 7,
+      "bfs_created": 552,
+      "bfs_expanded": 513,
+      "bfs_time": 0.0008089542388916016,
+      "ids_created": 1368,
+      "ids_expanded": 842,
+      "ids_time": 0.001302957534790039
+    },
+    {
+      "n": 8,
+      "bfs_created": 2057,
+      "bfs_expanded": 1966,
+      "bfs_time": 0.003522157669067383,
+      "ids_created": 5633,
+      "ids_expanded": 3656,
+      "ids_time": 0.006642818450927734
+    },
+    {
+      "n": 9,
+      "bfs_created": 8394,
+      "bfs_expanded": 8043,
+      "bfs_time": 0.016536235809326172,
+      "ids_created": 24072,
+      "ids_expanded": 16010,
+      "ids_time": 0.03102421760559082
+    },
+    {
+      "n": 10,
+      "bfs_created": 35539,
+      "bfs_expanded": 34816,
+      "bfs_time": 0.07901978492736816,
+      "ids_created": 110129,
+      "ids_expanded": 75291,
+      "ids_time": 0.17210102081298828
+    },
+    {
+      "n": 11,
+      "bfs_created": 166926,
+      "bfs_expanded": 164247,
+      "bfs_time": 0.43885278701782227,
+      "ids_created": 546441,
+      "ids_expanded": 382163,
+      "ids_time": 1.0324652194976807
+    },
+    {
+      "n": 12,
+      "bfs_created": 856189,
+      "bfs_expanded": 841990,
+      "bfs_time": 2.682528018951416,
+      "ids_created": 2916036,
+      "ids_expanded": 2074012,
+      "ids_time": 6.52923583984375
+    },
+    {
+      "n": 13,
+      "bfs_created": 4674890,
+      "bfs_expanded": 4601179,
+      "bfs_time": 16.693705081939697,
+      "ids_created": 16469724,
+      "ids_expanded": 11868502,
+      "ids_time": 44.80928087234497
+    },
+    {
+      "n": 14,
+      "bfs_created": 27358553,
+      "bfs_expanded": 26992958,
+      "bfs_time": 115.2772011756897,
+      "ids_created": 99282449,
+      "ids_expanded": 72289446,
+      "ids_time": 299.53498125076294
+    }
+  ],
+  "lights_out": [
+    {
+      "n": 2,
+      "bfs_created": 16,
+      "bfs_expanded": 15,
+      "bfs_time": 8.511543273925781e-05,
+      "ids_created": 43,
+      "ids_expanded": 21,
+      "ids_time": 4.57763671875e-05
+    },
+    {
+      "n": 3,
+      "bfs_created": 431,
+      "bfs_expanded": 305,
+      "bfs_time": 0.0002779960632324219,
+      "ids_created": 554,
+      "ids_expanded": 228,
+      "ids_time": 0.0003578662872314453
+    },
+    {
+      "n": 4,
+      "bfs_created": 4777,
+      "bfs_expanded": 1437,
+      "bfs_time": 0.0028290748596191406,
+      "ids_created": 1808,
+      "ids_expanded": 340,
+      "ids_time": 0.0010991096496582031
+    },
+    {
+      "n": 5,
+      "bfs_created": 30497298,
+      "bfs_expanded": 27525343,
+      "bfs_time": 20.364009857177734,
+      "ids_created": 96435226,
+      "ids_expanded": 68909708,
+      "ids_time": 61.233389139175415
+    }
+  ]
+}
