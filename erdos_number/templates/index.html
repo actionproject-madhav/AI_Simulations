@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikipedia Chain Finder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Six Degrees of Wikipedia</h1>
+        <p class="subtitle">Find the shortest connection between any two articles.</p>
+        
+        <div class="input-card">
+            <div class="input-group">
+                <label for="start">Start Article</label>
+                <input type="text" id="start" placeholder="e.g., Python (programming language)">
+            </div>
+            <div class="input-group">
+                <label for="end">End Article</label>
+                <input type="text" id="end" placeholder="e.g., Kevin Bacon">
+            </div>
+            <button id="search-btn">Find Connection</button>
+        </div>
+
+        <div id="status-container" class="hidden">
+            <div class="loader"></div>
+            <p id="status-text">Searching through Wikipedia...</p>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <h2>Connection Found!</h2>
+            <ul id="path-list"></ul>
+        </div>
+
+        <div id="error-container" class="hidden">
+            <p id="error-text"></p>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
