@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
+    <button class="theme-toggle" id="theme-toggle">Light Mode</button>
     <div class="container">
         <h1>Six Degrees of Wikipedia</h1>
         <p class="subtitle">Find the shortest connection between any two articles.</p>
-        
+
         <div class="input-card">
             <div class="input-group">
                 <label for="start">Start Article</label>
@@ -40,4 +43,5 @@
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>

@@ -1,3 +1,20 @@
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'dark';
+body.setAttribute('data-theme', savedTheme);
+themeToggle.innerText = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+
+themeToggle.addEventListener('click', () => {
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeToggle.innerText = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+});
+
 document.getElementById('search-btn').addEventListener('click', async () => {
     const start = document.getElementById('start').value;
     const end = document.getElementById('end').value;
