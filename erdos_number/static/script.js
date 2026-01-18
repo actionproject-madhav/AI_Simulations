@@ -56,12 +56,15 @@ function showError(msg) {
 }
 
 async function pollStatus(jobId) {
+    const statusText = document.getElementById('status-text');
     const interval = setInterval(async () => {
         try {
             const response = await fetch(`/api/search/${jobId}`);
             const data = await response.json();
 
-            if (data.status === 'complete') {
+            if (data.status === 'searching') {
+                statusText.innerText = `Searching between "${data.start}" and "${data.end}"...`;
+            } else if (data.status === 'complete') {
                 clearInterval(interval);
                 showResults(data.path);
             } else if (data.status === 'failed') {
@@ -78,7 +81,14 @@ async function pollStatus(jobId) {
 function showResults(path) {
     document.getElementById('status-container').classList.add('hidden');
     document.getElementById('results-container').classList.remove('hidden');
+
+    // Calculate and show degrees of separation
+    const degree = path.length - 1;
+    const header = document.querySelector('#results-container h2');
+    header.innerText = `Connected in ${degree} Degree${degree !== 1 ? 's' : ''}!`;
+
     const list = document.getElementById('path-list');
+    list.innerHTML = ''; // Clear previous
     path.forEach(node => {
         const li = document.createElement('li');
         li.innerText = node;

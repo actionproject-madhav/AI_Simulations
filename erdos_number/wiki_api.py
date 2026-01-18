@@ -7,7 +7,7 @@ USER_AGENT = "WikipediaChainFinder/1.0 (https://github.com/google/antigravity; c
 from database import get_cached_links, save_links
 
 def get_links_for_page(title: str) -> Set[str]:
-    """Fetches all internal links (Namespace 0) with caching."""
+    """Fetches all internal links (Namespace 0) with caching and redirect handling."""
     cached = get_cached_links(title, incoming=False)
     if cached is not None:
         return cached
@@ -18,6 +18,7 @@ def get_links_for_page(title: str) -> Set[str]:
         "format": "json",
         "titles": title,
         "prop": "links",
+        "redirects": 1,  # Follow redirects
         "plnamespace": 0,
         "pllimit": "max"
     }
@@ -28,8 +29,16 @@ def get_links_for_page(title: str) -> Set[str]:
             response = requests.get(WIKI_API_URL, params=params, headers=headers)
             response.raise_for_status()
             data = response.json()
-            pages = data.get("query", {}).get("pages", {})
+            
+            # Handle normalization/redirect info
+            query = data.get("query", {})
+            if "normalized" in query:
+                # Actual title might be different
+                pass
+            
+            pages = query.get("pages", {})
             for page_id, page_data in pages.items():
+                if int(page_id) < 0: continue # Page doesn't exist
                 if "links" in page_data:
                     for link in page_data["links"]:
                         links.add(link["title"])
@@ -45,7 +54,7 @@ def get_links_for_page(title: str) -> Set[str]:
     return links
 
 def get_incoming_links(title: str) -> Set[str]:
-    """Fetches pages that link TO the given title with caching."""
+    """Fetches pages that link TO the given title with caching and redirects."""
     cached = get_cached_links(title, incoming=True)
     if cached is not None:
         return cached
@@ -56,6 +65,7 @@ def get_incoming_links(title: str) -> Set[str]:
         "format": "json",
         "titles": title,
         "prop": "linkshere",
+        "redirects": 1,
         "lhnamespace": 0,
         "lhlimit": "max"
     }
@@ -65,8 +75,10 @@ def get_incoming_links(title: str) -> Set[str]:
         try:
             response = requests.get(WIKI_API_URL, params=params, headers=headers)
             data = response.json()
-            pages = data.get("query", {}).get("pages", {})
+            query = data.get("query", {})
+            pages = query.get("pages", {})
             for page_id, page_data in pages.items():
+                if int(page_id) < 0: continue
                 if "linkshere" in page_data:
                     for link in page_data["linkshere"]:
                         links.add(link["title"])

@@ -14,11 +14,20 @@ jobs: Dict[str, Dict[str, Any]] = {}
 
 from search import bidirectional_wiki_search
 
+def sanitize_title(title: str) -> str:
+    """Extracts the Wikipedia title from a URL if provided, and normalizes it."""
+    title = title.strip()
+    if "wikipedia.org/wiki/" in title:
+        title = title.split("wikipedia.org/wiki/")[-1].split("?")[0].split("#")[0]
+        from urllib.parse import unquote
+        title = unquote(title).replace("_", " ")
+    return title
+
 @app.route("/api/search", methods=["POST"])
 def start_search():
     data = request.json
-    start_title = data.get("start")
-    end_title = data.get("end")
+    start_title = sanitize_title(data.get("start", ""))
+    end_title = sanitize_title(data.get("end", ""))
     
     if not start_title or not end_title:
         return jsonify({"error": "Missing start or end title"}), 400
@@ -29,6 +38,7 @@ def start_search():
         "start": start_title,
         "end": end_title,
         "path": None,
+        "processed_nodes": 0,
         "error": None
     }
     
