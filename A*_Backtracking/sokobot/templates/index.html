@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sokoban - Play & Solve</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 10px;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #000;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .puzzle-select {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 1px solid #000;
+            font-size: 16px;
+            cursor: pointer;
+            background: #fff;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 1px solid #000;
+            font-size: 16px;
+            cursor: pointer;
+            background: #fff;
+            color: #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+        }
+
+        .btn-secondary {
+            background: #000;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #333;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+
+        .btn-danger:hover {
+            background: #ddd;
+        }
+
+        .btn-info {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+
+        .btn-info:hover {
+            background: #ddd;
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .game-area {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        #puzzle-grid {
+            display: inline-grid;
+            gap: 1px;
+            background: #000;
+            padding: 10px;
+            margin: 20px 0;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .wall {
+            background: #000;
+            color: #fff;
+        }
+
+        .floor {
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .goal {
+            background: #fff;
+            border: 1px solid #000;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #000;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .stat {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 10px 20px;
+        }
+
+        .instructions {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        .instructions li:before {
+            content: "- ";
+            color: #000;
+        }
+
+        .win-message {
+            background: #000;
+            color: #fff;
+            border: 2px solid #000;
+            padding: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .solution-display {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .solution-display.active {
+            display: block;
+        }
+
+        .solution-steps {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .solution-step {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 8px 12px;
+            margin: 5px 0;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #000;
+            font-size: 16px;
+        }
+
+        #loading.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SOKOBAN</h1>
+        <p class="subtitle">Push all boxes onto goals - Use arrow keys to move</p>
+
+        <div class="controls">
+            <div class="puzzle-select">
+                <select id="puzzle-select">
+                    <option value="">Select a puzzle...</option>
+                </select>
+                <button class="btn-primary" onclick="loadSelectedPuzzle()">Load</button>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-info" onclick="undoMove()" id="undo-btn" disabled>Undo</button>
+                <button class="btn-danger" onclick="resetPuzzle()" id="reset-btn" disabled>Reset</button>
+                <button class="btn-secondary" onclick="solvePuzzle()" id="solve-btn" disabled>Solve</button>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div id="status" class="status">Select a puzzle to start playing!</div>
+
+            <div id="puzzle-grid"></div>
+
+            <div id="loading">
+                Solving puzzle...
+            </div>
+
+            <div class="stats" id="stats" style="display: none;">
+                <div class="stat">Moves: <span id="move-count">0</span></div>
+                <div class="stat">Boxes: <span id="box-count">0</span>/<span id="goal-count">0</span></div>
+            </div>
+
+            <div id="solution-display" class="solution-display">
+                <h3>Solution</h3>
+                <p>Found in <span id="solution-length">0</span> moves (explored <span id="states-explored">0</span> states)</p>
+                <div class="solution-steps" id="solution-steps"></div>
+                <button class="btn-primary" onclick="playSolution()" style="margin-top: 10px;">Play Solution</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li><strong>Goal:</strong> Push all boxes onto the storage locations</li>
+                <li><strong>Controls:</strong> Use arrow keys to move the player</li>
+                <li><strong>Rules:</strong> You can only push boxes, not pull them. Only one box at a time</li>
+                <li><strong>Solve:</strong> Click "Solve" to see the solution</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentPuzzle = null;
+        let currentSolution = null;
+        let solutionIndex = 0;
+
+        // Load available puzzles on page load
+        window.onload = async function() {
+            const response = await fetch('/api/puzzles');
+            const puzzles = await response.json();
+
+            const select = document.getElementById('puzzle-select');
+            puzzles.forEach(puzzle => {
+                const option = document.createElement('option');
+                option.value = puzzle.name;
+                option.textContent = `${puzzle.name} (${puzzle.size}, ${puzzle.boxes} boxes)`;
+                select.appendChild(option);
+            });
+        };
+
+        async function loadSelectedPuzzle() {
+            const select = document.getElementById('puzzle-select');
+            const puzzleName = select.value;
+
+            if (!puzzleName) return;
+
+            const response = await fetch(`/api/load/${puzzleName}`);
+            const data = await response.json();
+
+            currentPuzzle = data.puzzle;
+            currentSolution = null;
+            document.getElementById('solution-display').classList.remove('active');
+
+            renderPuzzle(currentPuzzle);
+            updateStatus('Use arrow keys to move!');
+            updateStats(0);
+
+            document.getElementById('undo-btn').disabled = false;
+            document.getElementById('reset-btn').disabled = false;
+            document.getElementById('solve-btn').disabled = false;
+            document.getElementById('stats').style.display = 'flex';
+        }
+
+        function renderPuzzle(puzzle) {
+            const grid = document.getElementById('puzzle-grid');
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${puzzle.cols}, 50px)`;
+
+            puzzle.grid.forEach(row => {
+                row.forEach(cell => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+
+                    if (cell.type === 'wall') {
+                        cellDiv.className += ' wall';
+                        cellDiv.textContent = '#';
+                    } else {
+                        if (cell.hasGoal) {
+                            cellDiv.className += ' goal';
+                        } else {
+                            cellDiv.className += ' floor';
+                        }
+
+                        if (cell.hasBox && cell.hasGoal) {
+                            cellDiv.textContent = '*';
+                        } else if (cell.hasBox) {
+                            cellDiv.textContent = '$';
+                        } else if (cell.hasPlayer && cell.hasGoal) {
+                            cellDiv.textContent = '+';
+                        } else if (cell.hasPlayer) {
+                            cellDiv.textContent = '@';
+                        } else if (cell.hasGoal) {
+                            cellDiv.textContent = '.';
+                        }
+                    }
+
+                    grid.appendChild(cellDiv);
+                });
+            });
+
+            if (puzzle.won) {
+                showWinMessage();
+            }
+        }
+
+        async function makeMove(direction) {
+            if (!currentPuzzle) return;
+
+            const response = await fetch('/api/move', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({direction})
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                currentPuzzle = data.puzzle;
+                renderPuzzle(currentPuzzle);
+                updateStats(data.moves);
+
+                if (data.won) {
+                    showWinMessage();
+                }
+            }
+        }
+
+        async function undoMove() {
+            const response = await fetch('/api/undo', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                currentPuzzle = data.puzzle;
+                renderPuzzle(currentPuzzle);
+                updateStats(data.moves);
+                updateStatus('Move undone');
+            }
+        }
+
+        async function resetPuzzle() {
+            const response = await fetch('/api/reset', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                currentPuzzle = data.puzzle;
+                currentSolution = null;
+                document.getElementById('solution-display').classList.remove('active');
+                renderPuzzle(currentPuzzle);
+                updateStats(0);
+                updateStatus('Puzzle reset!');
+            }
+        }
+
+        async function solvePuzzle() {
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('solve-btn').disabled = true;
+
+            const response = await fetch('/api/solve', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+            document.getElementById('loading').classList.remove('active');
+            document.getElementById('solve-btn').disabled = false;
+
+            if (data.solved) {
+                currentSolution = data.moves;
+                solutionIndex = 0;
+
+                document.getElementById('solution-length').textContent = data.length;
+                document.getElementById('states-explored').textContent = data.states_explored;
+
+                const stepsDiv = document.getElementById('solution-steps');
+                stepsDiv.innerHTML = '';
+                data.moves.forEach((move, i) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'solution-step';
+                    stepDiv.textContent = `Step ${i+1}: Move ${move.direction}`;
+                    stepsDiv.appendChild(stepDiv);
+                });
+
+                document.getElementById('solution-display').classList.add('active');
+                updateStatus('Solution found! Click "Play Solution" to watch.');
+            } else {
+                alert('Could not solve puzzle: ' + data.message);
+            }
+        }
+
+        async function playSolution() {
+            if (!currentSolution || solutionIndex >= currentSolution.length) {
+                // Reset to beginning
+                await resetPuzzle();
+                solutionIndex = 0;
+            }
+
+            const playNextMove = async () => {
+                if (solutionIndex < currentSolution.length) {
+                    await makeMove(currentSolution[solutionIndex].direction);
+                    solutionIndex++;
+                    setTimeout(playNextMove, 500);
+                }
+            };
+
+            playNextMove();
+        }
+
+        function showWinMessage() {
+            updateStatus('SOLVED');
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+        }
+
+        function updateStats(moves) {
+            document.getElementById('move-count').textContent = moves;
+
+            if (currentPuzzle) {
+                let boxesOnGoals = 0;
+                let totalBoxes = 0;
+                let totalGoals = 0;
+
+                currentPuzzle.grid.forEach(row => {
+                    row.forEach(cell => {
+                        if (cell.hasGoal) totalGoals++;
+                        if (cell.hasBox) {
+                            totalBoxes++;
+                            if (cell.hasGoal) boxesOnGoals++;
+                        }
+                    });
+                });
+
+                document.getElementById('box-count').textContent = boxesOnGoals;
+                document.getElementById('goal-count').textContent = totalGoals;
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!currentPuzzle) return;
+
+            const keyMap = {
+                'ArrowUp': 'up',
+                'ArrowDown': 'down',
+                'ArrowLeft': 'left',
+                'ArrowRight': 'right',
+                'w': 'up',
+                's': 'down',
+                'a': 'left',
+                'd': 'right'
+            };
+
+            const direction = keyMap[e.key];
+            if (direction) {
+                e.preventDefault();
+                makeMove(direction);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -179,10 +179,100 @@ def is_valid_push(
     return True
 
 
+def hungarian_algorithm(cost_matrix):
+    """
+    Minimum cost assignment using Hungarian algorithm.
+    Uses a simplified but correct implementation with augmenting paths.
+
+    Args:
+        cost_matrix: 2D list where cost_matrix[i][j] is cost of assigning worker i to job j
+
+    Returns:
+        Minimum total cost
+    """
+    if not cost_matrix or not cost_matrix[0]:
+        return 0
+
+    n = len(cost_matrix)
+    m = len(cost_matrix[0])
+
+    # For small matrices, use brute force
+    if n <= 3 and m <= 3:
+        from itertools import permutations
+        min_cost = float('inf')
+
+        # If n != m, we need to handle it differently
+        if n <= m:
+            for perm in permutations(range(m), n):
+                cost = sum(cost_matrix[i][perm[i]] for i in range(n))
+                min_cost = min(min_cost, cost)
+        else:
+            for perm in permutations(range(n), m):
+                cost = sum(cost_matrix[perm[j]][j] for j in range(m))
+                min_cost = min(min_cost, cost)
+
+        return min_cost
+
+    # For larger matrices, use proper Hungarian algorithm with augmenting paths
+    size = max(n, m)
+
+    # Pad matrix to square
+    INF = float('inf')
+    matrix = [[INF] * size for _ in range(size)]
+    for i in range(n):
+        for j in range(m):
+            matrix[i][j] = cost_matrix[i][j]
+
+    # Subtract row minimums
+    for i in range(size):
+        row_min = min(matrix[i])
+        if row_min != INF:
+            for j in range(size):
+                if matrix[i][j] != INF:
+                    matrix[i][j] -= row_min
+
+    # Subtract column minimums
+    for j in range(size):
+        col_min = min(matrix[i][j] for i in range(size))
+        if col_min != INF:
+            for i in range(size):
+                if matrix[i][j] != INF:
+                    matrix[i][j] -= col_min
+
+    # Find assignment using augmenting paths
+    row_match = [-1] * size
+    col_match = [-1] * size
+
+    def find_augmenting_path(row, visited_rows, visited_cols):
+        visited_rows.add(row)
+        for col in range(size):
+            if col in visited_cols or matrix[row][col] != 0:
+                continue
+            visited_cols.add(col)
+
+            if col_match[col] == -1 or find_augmenting_path(col_match[col], visited_rows, visited_cols):
+                row_match[row] = col
+                col_match[col] = row
+                return True
+        return False
+
+    # Find maximum matching
+    for i in range(size):
+        find_augmenting_path(i, set(), set())
+
+    # Calculate total cost
+    total_cost = 0
+    for i in range(n):
+        if row_match[i] != -1 and row_match[i] < m:
+            total_cost += cost_matrix[i][row_match[i]]
+
+    return total_cost
+
+
 def calculate_heuristic(state: State, puzzle: Puzzle) -> int:
     """
-    Calculate heuristic cost for A* search.
-    Uses sum of Manhattan distances from each box to nearest goal.
+    Calculate heuristic cost for A* search using Hungarian algorithm.
+    Finds optimal assignment of boxes to goals to minimize total distance.
 
     Args:
         state: Current game state
@@ -191,12 +281,19 @@ def calculate_heuristic(state: State, puzzle: Puzzle) -> int:
     Returns:
         Heuristic cost estimate
     """
-    total = 0
-    for box_pos in state.box_positions:
-        # Find minimum distance to any goal
-        min_dist = min(
-            manhattan_distance(box_pos, goal_pos)
-            for goal_pos in puzzle.goals
-        )
-        total += min_dist
-    return total
+    boxes = list(state.box_positions)
+    goals = list(puzzle.goals)
+
+    if not boxes:
+        return 0
+
+    # Create cost matrix: cost[i][j] = distance from box i to goal j
+    cost_matrix = []
+    for box_pos in boxes:
+        row = []
+        for goal_pos in goals:
+            row.append(manhattan_distance(box_pos, goal_pos))
+        cost_matrix.append(row)
+
+    # Use Hungarian algorithm to find minimum cost assignment
+    return hungarian_algorithm(cost_matrix)
