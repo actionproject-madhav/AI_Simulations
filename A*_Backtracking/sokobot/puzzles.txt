@@ -1,0 +1,22 @@
+# Sample Sokoban Puzzles
+# Format: standard Sokoban text format
+# # = wall, @ = player, $ = box, . = goal, * = box on goal, + = player on goal
+
+# Puzzle 1: Trivial (1 move)
+#####
+#@$.#
+#####
+
+# Puzzle 2: Corner Test
+#######
+#  .  #
+# $@$ #
+#  .  #
+#######
+
+# Puzzle 3: Line Push
+#########
+#   .   #
+# @ $$$ #
+#   ...##
+#########
