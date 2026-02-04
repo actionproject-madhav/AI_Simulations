@@ -3,6 +3,7 @@
 Flask web server for interactive Sokoban game.
 """
 
+from collections import deque
 from flask import Flask, render_template, jsonify, request
 from puzzle import Puzzle, State
 from solver import solve
@@ -41,7 +42,7 @@ PUZZLES = {
   #####
   #   #
   #$  #
-###@$##
+###@$ #
 #  $  #
 # ...##
 ########
@@ -194,34 +195,62 @@ def solve_puzzle():
             'message': result.message
         })
 
-    # Convert moves to direction strings
-    solution_moves = []
+    DELTA_TO_DIR = {(-1, 0): 'up', (1, 0): 'down', (0, -1): 'left', (0, 1): 'right'}
+
+    # Build push summary for display and expanded replay path for execution
+    pushes = []
+    replay = []
+    player = current_puzzle.initial_state.player_pos
+    boxes = set(current_puzzle.initial_state.box_positions)
+
     for move in result.moves:
-        # Determine direction from box movement
         dr = move.box_to[0] - move.box_from[0]
         dc = move.box_to[1] - move.box_from[1]
+        direction = DELTA_TO_DIR[(dr, dc)]
+        pushes.append({'direction': direction, 'box_from': move.box_from, 'box_to': move.box_to})
 
-        if dr == -1:
-            direction = 'up'
-        elif dr == 1:
-            direction = 'down'
-        elif dc == -1:
-            direction = 'left'
-        else:
-            direction = 'right'
+        # Player must walk to the push-from position (opposite side of box)
+        push_from = (move.box_from[0] - dr, move.box_from[1] - dc)
+        walk_path = find_player_path(player, push_from, current_puzzle.walls, boxes)
+        replay.extend(walk_path)
 
-        solution_moves.append({
-            'direction': direction,
-            'box_from': move.box_from,
-            'box_to': move.box_to
-        })
+        # Then execute the push itself
+        replay.append(direction)
+        boxes.discard(move.box_from)
+        boxes.add(move.box_to)
+        player = move.box_from
 
     return jsonify({
         'solved': True,
-        'moves': solution_moves,
+        'pushes': pushes,
+        'replay': replay,
         'length': result.solution_length,
         'states_explored': result.states_explored
     })
+
+
+def find_player_path(start, target, walls, boxes):
+    """BFS shortest path for player from start to target, avoiding walls and boxes.
+    Returns list of direction strings."""
+    if start == target:
+        return []
+    DELTAS = [(-1, 0, 'up'), (1, 0, 'down'), (0, -1, 'left'), (0, 1, 'right')]
+    visited = {start}
+    queue = deque([(start, [])])
+    while queue:
+        pos, path = queue.popleft()
+        for dr, dc, name in DELTAS:
+            npos = (pos[0] + dr, pos[1] + dc)
+            if npos in visited or npos in walls or npos in boxes:
+                continue
+            if npos[0] < 0 or npos[1] < 0:
+                continue
+            new_path = path + [name]
+            if npos == target:
+                return new_path
+            visited.add(npos)
+            queue.append((npos, new_path))
+    return []
 
 
 def try_move(state, delta, puzzle):

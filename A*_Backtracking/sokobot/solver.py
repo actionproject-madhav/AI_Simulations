@@ -166,7 +166,7 @@ def solve_and_display(puzzle: Puzzle, verbose: bool = True) -> SolverResult:
                 # Apply move to get next state
                 new_box_positions = (current_state.box_positions - {move.box_from}) | {move.box_to}
                 current_state = State(
-                    player_pos=move.box_to,  # Player moves to where box was
+                    player_pos=move.box_from,  # Player moves to where box was
                     box_positions=frozenset(new_box_positions)
                 )
 

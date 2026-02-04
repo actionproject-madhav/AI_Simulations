@@ -166,10 +166,8 @@ def is_valid_push(
     if not puzzle.is_valid_floor(push_from_pos):
         return False
 
-    # Player must be able to reach push-from position
-    # For reachability check, treat all boxes except the one being pushed as obstacles
-    other_boxes = state.box_positions - {box_pos}
-    if not can_player_reach(state.player_pos, push_from_pos, puzzle, other_boxes):
+    # Player must be able to reach push-from position without walking through any box
+    if not can_player_reach(state.player_pos, push_from_pos, puzzle, state.box_positions):
         return False
 
     # Check 4: Box must not end up in corner deadlock

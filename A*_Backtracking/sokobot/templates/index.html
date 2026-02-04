@@ -152,18 +152,23 @@
         }
 
         .wall {
-            background: #000;
-            color: #fff;
+            background: #2c2c2c;
+            box-shadow: inset 0 0 0 3px #1a1a1a;
         }
 
         .floor {
-            background: #fff;
-            border: 1px solid #ddd;
+            background: #e0d5c3;
+            border: 1px solid #ccc4b0;
         }
 
         .goal {
-            background: #fff;
-            border: 1px solid #000;
+            background: #e0d5c3;
+            border: 1px solid #ccc4b0;
+        }
+
+        .box-on-goal {
+            background: #c8e6c9 !important;
+            border: 1px solid #a5d6a7 !important;
         }
 
         .status {
@@ -368,7 +373,7 @@
 
                     if (cell.type === 'wall') {
                         cellDiv.className += ' wall';
-                        cellDiv.textContent = '#';
+                        cellDiv.textContent = '🧱';
                     } else {
                         if (cell.hasGoal) {
                             cellDiv.className += ' goal';
@@ -377,15 +382,14 @@
                         }
 
                         if (cell.hasBox && cell.hasGoal) {
-                            cellDiv.textContent = '*';
+                            cellDiv.className += ' box-on-goal';
+                            cellDiv.textContent = '📦';
                         } else if (cell.hasBox) {
-                            cellDiv.textContent = '$';
-                        } else if (cell.hasPlayer && cell.hasGoal) {
-                            cellDiv.textContent = '+';
+                            cellDiv.textContent = '📦';
                         } else if (cell.hasPlayer) {
-                            cellDiv.textContent = '@';
+                            cellDiv.textContent = '🧑';
                         } else if (cell.hasGoal) {
-                            cellDiv.textContent = '.';
+                            cellDiv.textContent = '🎯';
                         }
                     }
 
@@ -463,7 +467,7 @@
             document.getElementById('solve-btn').disabled = false;
 
             if (data.solved) {
-                currentSolution = data.moves;
+                currentSolution = data.replay;
                 solutionIndex = 0;
 
                 document.getElementById('solution-length').textContent = data.length;
@@ -471,10 +475,10 @@
 
                 const stepsDiv = document.getElementById('solution-steps');
                 stepsDiv.innerHTML = '';
-                data.moves.forEach((move, i) => {
+                data.pushes.forEach((move, i) => {
                     const stepDiv = document.createElement('div');
                     stepDiv.className = 'solution-step';
-                    stepDiv.textContent = `Step ${i+1}: Move ${move.direction}`;
+                    stepDiv.textContent = `Step ${i+1}: Push ${move.direction}`;
                     stepsDiv.appendChild(stepDiv);
                 });
 
@@ -486,17 +490,17 @@
         }
 
         async function playSolution() {
-            if (!currentSolution || solutionIndex >= currentSolution.length) {
-                // Reset to beginning
-                await resetPuzzle();
-                solutionIndex = 0;
-            }
+            if (!currentSolution) return;
+
+            // Always reset first — solution was computed from initial state
+            await resetPuzzle();
+            solutionIndex = 0;
 
             const playNextMove = async () => {
                 if (solutionIndex < currentSolution.length) {
-                    await makeMove(currentSolution[solutionIndex].direction);
+                    await makeMove(currentSolution[solutionIndex]);
                     solutionIndex++;
-                    setTimeout(playNextMove, 500);
+                    setTimeout(playNextMove, 300);
                 }
             };
 
