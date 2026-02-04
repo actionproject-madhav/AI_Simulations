@@ -408,7 +408,7 @@
         }
 
         async function makeMove(direction) {
-            if (!currentPuzzle) return;
+            if (!currentPuzzle) return false;
 
             const response = await fetch('/api/move', {
                 method: 'POST',
@@ -417,6 +417,7 @@
             });
 
             const data = await response.json();
+            console.log(`Move ${direction}:`, data.success ? 'OK' : 'FAILED', data);
 
             if (data.success) {
                 currentPuzzle = data.puzzle;
@@ -462,6 +463,11 @@
         }
 
         async function solvePuzzle() {
+            if (!currentPuzzle) {
+                alert('Please load a puzzle first!');
+                return;
+            }
+
             document.getElementById('loading').classList.add('active');
             document.getElementById('solve-btn').disabled = true;
 
@@ -470,37 +476,46 @@
             });
 
             const data = await response.json();
+            console.log('Solve response:', data);
             document.getElementById('loading').classList.remove('active');
             document.getElementById('solve-btn').disabled = false;
 
             if (data.solved) {
                 currentSolution = data.replay;
                 solutionIndex = 0;
+                console.log('Solution stored:', currentSolution?.length, 'moves');
 
                 document.getElementById('solution-length').textContent = data.length;
                 document.getElementById('states-explored').textContent = data.states_explored;
 
                 const stepsDiv = document.getElementById('solution-steps');
                 stepsDiv.innerHTML = '';
-                    const fmtPos = (p) => `(${p[0] + 1},${p[1] + 1})`; // 1-indexed (row,col)
+                const fmtPos = (p) => `(${p[0] + 1},${p[1] + 1})`; // 1-indexed (row,col)
                 data.pushes.forEach((move, i) => {
                     const stepDiv = document.createElement('div');
                     stepDiv.className = 'solution-step';
-                        stepDiv.textContent = `Step ${i+1}: Push ${move.direction}  box ${fmtPos(move.box_from)} → ${fmtPos(move.box_to)}`;
+                    stepDiv.textContent = `Step ${i+1}: Push ${move.direction}  box ${fmtPos(move.box_from)} → ${fmtPos(move.box_to)}`;
                     stepsDiv.appendChild(stepDiv);
                 });
 
                 document.getElementById('solution-display').classList.add('active');
-                    updateStatus('Solution found! Steps list pushes only; "Play Solution" includes walking + pushing.');
+                updateStatus('Solution found! Click "Play Solution" to watch it animate.');
             } else {
                 alert('Could not solve puzzle: ' + data.message);
             }
         }
 
         async function playSolution() {
-            if (!currentSolution) return;
+            if (!currentSolution) {
+                console.error('No solution available! currentSolution is:', currentSolution);
+                alert('No solution available. Click "Solve" first.');
+                return;
+            }
             if (isPlayingSolution) return;
             isPlayingSolution = true;
+
+            // Save solution before reset (resetPuzzle clears currentSolution!)
+            const savedSolution = currentSolution;
 
             // Disable controls while playing
             document.getElementById('undo-btn').disabled = true;
@@ -509,15 +524,21 @@
 
             // Always reset first — solution was computed from initial state
             await resetPuzzle();
+            
+            // Restore solution after reset
+            currentSolution = savedSolution;
             solutionIndex = 0;
 
             try {
+                console.log('Starting solution playback:', currentSolution);
                 for (let i = 0; i < currentSolution.length; i++) {
                     const dir = currentSolution[i];
+                    console.log(`Playing step ${i + 1}/${currentSolution.length}: ${dir}`);
                     updateStatus(`Playing solution: step ${i + 1}/${currentSolution.length} (${dir})`);
 
                     const ok = await makeMove(dir);
                     if (!ok) {
+                        console.error(`Step ${i + 1} failed!`);
                         updateStatus('Playback stopped: invalid step in replay (solver/UI out of sync).');
                         break;
                     }
@@ -525,6 +546,7 @@
                     // Give the browser time to paint before next move
                     await sleep(220);
                 }
+                console.log('Playback complete');
 
                 if (currentPuzzle?.won) {
                     updateStatus('SOLVED');
