@@ -297,7 +297,7 @@
 
             <div class="stats" id="stats" style="display: none;">
                 <div class="stat">Moves: <span id="move-count">0</span></div>
-                <div class="stat">Boxes: <span id="box-count">0</span>/<span id="goal-count">0</span></div>
+                <div class="stat">Boxes on goals: <span id="box-count">0</span>/<span id="goal-count">0</span></div>
             </div>
 
             <div id="solution-display" class="solution-display">
@@ -323,6 +323,11 @@
         let currentPuzzle = null;
         let currentSolution = null;
         let solutionIndex = 0;
+        let isPlayingSolution = false;
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
         // Load available puzzles on page load
         window.onload = async function() {
@@ -421,7 +426,9 @@
                 if (data.won) {
                     showWinMessage();
                 }
+                return true;
             }
+            return false;
         }
 
         async function undoMove() {
@@ -475,15 +482,16 @@
 
                 const stepsDiv = document.getElementById('solution-steps');
                 stepsDiv.innerHTML = '';
+                    const fmtPos = (p) => `(${p[0] + 1},${p[1] + 1})`; // 1-indexed (row,col)
                 data.pushes.forEach((move, i) => {
                     const stepDiv = document.createElement('div');
                     stepDiv.className = 'solution-step';
-                    stepDiv.textContent = `Step ${i+1}: Push ${move.direction}`;
+                        stepDiv.textContent = `Step ${i+1}: Push ${move.direction}  box ${fmtPos(move.box_from)} → ${fmtPos(move.box_to)}`;
                     stepsDiv.appendChild(stepDiv);
                 });
 
                 document.getElementById('solution-display').classList.add('active');
-                updateStatus('Solution found! Click "Play Solution" to watch.');
+                    updateStatus('Solution found! Steps list pushes only; "Play Solution" includes walking + pushing.');
             } else {
                 alert('Could not solve puzzle: ' + data.message);
             }
@@ -491,20 +499,45 @@
 
         async function playSolution() {
             if (!currentSolution) return;
+            if (isPlayingSolution) return;
+            isPlayingSolution = true;
+
+            // Disable controls while playing
+            document.getElementById('undo-btn').disabled = true;
+            document.getElementById('reset-btn').disabled = true;
+            document.getElementById('solve-btn').disabled = true;
 
             // Always reset first — solution was computed from initial state
             await resetPuzzle();
             solutionIndex = 0;
 
-            const playNextMove = async () => {
-                if (solutionIndex < currentSolution.length) {
-                    await makeMove(currentSolution[solutionIndex]);
-                    solutionIndex++;
-                    setTimeout(playNextMove, 300);
-                }
-            };
+            try {
+                for (let i = 0; i < currentSolution.length; i++) {
+                    const dir = currentSolution[i];
+                    updateStatus(`Playing solution: step ${i + 1}/${currentSolution.length} (${dir})`);
 
-            playNextMove();
+                    const ok = await makeMove(dir);
+                    if (!ok) {
+                        updateStatus('Playback stopped: invalid step in replay (solver/UI out of sync).');
+                        break;
+                    }
+
+                    // Give the browser time to paint before next move
+                    await sleep(220);
+                }
+
+                if (currentPuzzle?.won) {
+                    updateStatus('SOLVED');
+                } else {
+                    updateStatus('Playback finished.');
+                }
+            } finally {
+                isPlayingSolution = false;
+                // Re-enable controls
+                document.getElementById('undo-btn').disabled = false;
+                document.getElementById('reset-btn').disabled = false;
+                document.getElementById('solve-btn').disabled = false;
+            }
         }
 
         function showWinMessage() {

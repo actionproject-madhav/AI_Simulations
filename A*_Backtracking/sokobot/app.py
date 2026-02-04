@@ -211,7 +211,12 @@ def solve_puzzle():
 
         # Player must walk to the push-from position (opposite side of box)
         push_from = (move.box_from[0] - dr, move.box_from[1] - dc)
-        walk_path = find_player_path(player, push_from, current_puzzle.walls, boxes)
+        walk_path = find_player_path(player, push_from, current_puzzle, boxes)
+        if player != push_from and walk_path is None:
+            return jsonify({
+                'solved': False,
+                'message': 'Internal error: could not reconstruct walk path for solution replay'
+            }), 500
         replay.extend(walk_path)
 
         # Then execute the push itself
@@ -229,9 +234,9 @@ def solve_puzzle():
     })
 
 
-def find_player_path(start, target, walls, boxes):
+def find_player_path(start, target, puzzle: Puzzle, boxes):
     """BFS shortest path for player from start to target, avoiding walls and boxes.
-    Returns list of direction strings."""
+    Returns list of direction strings, or None if unreachable."""
     if start == target:
         return []
     DELTAS = [(-1, 0, 'up'), (1, 0, 'down'), (0, -1, 'left'), (0, 1, 'right')]
@@ -241,16 +246,17 @@ def find_player_path(start, target, walls, boxes):
         pos, path = queue.popleft()
         for dr, dc, name in DELTAS:
             npos = (pos[0] + dr, pos[1] + dc)
-            if npos in visited or npos in walls or npos in boxes:
+            if npos in visited or npos in boxes:
                 continue
-            if npos[0] < 0 or npos[1] < 0:
+            # Respect puzzle bounds/walls (critical for correct replay)
+            if not puzzle.is_valid_floor(npos):
                 continue
             new_path = path + [name]
             if npos == target:
                 return new_path
             visited.add(npos)
             queue.append((npos, new_path))
-    return []
+    return None
 
 
 def try_move(state, delta, puzzle):
@@ -322,6 +328,8 @@ def serialize_puzzle(puzzle, state):
 
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get("PORT", "5001"))
     print("Starting Sokoban game server...")
-    print("Open http://localhost:5001 in your browser")
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    print(f"Open http://localhost:{port} in your browser")
+    app.run(debug=True, host='0.0.0.0', port=port)
