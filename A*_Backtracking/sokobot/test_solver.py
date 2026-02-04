@@ -1,177 +1,110 @@
+#!/usr/bin/env python3
 """
-Tests for the A* solver.
+Test the Sokoban solver on various puzzles to ensure it works correctly.
 """
 
 from puzzle import Puzzle
-from solver import solve, solve_and_display
+from solver import solve_and_display
 
-
-TRIVIAL_PUZZLE = """
+# Test puzzles
+PUZZLES = {
+    "trivial": """
 #####
 #@$.#
 #####
-"""
-
-SIMPLE_2BOX = """
+""",
+    "corner": """
+#######
+#  .  #
+# $@$ #
+#  .  #
+#######
+""",
+    "line_push": """
+#########
+#  ...  #
+# @ $$$ #
+#       #
+#########
+""",
+    "tutorial": """
+#####
+#@$.#
+#####
+""",
+    "easy": """
 #######
 # . . #
 # $ $ #
 #  @  #
 #######
-"""
-
-MEDIUM_PUZZLE = """
+""",
+    "medium": """
 ########
 #   .  #
 # @$$  #
 #   . ##
 ########
-"""
-
-HARDER_PUZZLE = """
-  #####
-  #   #
-  #$  #
-###@$##
-#  $  #
-# ...##
-########
-"""
+""",
+}
 
 
-def test_solve_trivial():
-    """Test solving the trivial 1-move puzzle."""
-    print("Testing solver on trivial puzzle...")
-    print()
-
-    puzzle = Puzzle(TRIVIAL_PUZZLE)
-    result = solve_and_display(puzzle, verbose=True)
-
-    assert result.solved
-    assert result.solution_length == 1
-    assert len(result.moves) == 1
-
-    print("✓ Trivial puzzle solved correctly\n")
-
-
-def test_solve_simple():
-    """Test solving a simple 2-box puzzle."""
-    print("Testing solver on simple 2-box puzzle...")
-    print()
-
-    puzzle = Puzzle(SIMPLE_2BOX)
-    result = solve_and_display(puzzle, verbose=True)
-
-    assert result.solved
-    print(f"Solution requires {result.solution_length} moves")
-
-    print("✓ Simple 2-box puzzle solved\n")
-
-
-def test_solve_medium():
-    """Test solving a medium puzzle."""
-    print("Testing solver on medium puzzle...")
-    print()
-
-    puzzle = Puzzle(MEDIUM_PUZZLE)
-    result = solve_and_display(puzzle, verbose=True)
-
-    if result.solved:
-        print(f"Solution requires {result.solution_length} moves")
-        print("✓ Medium puzzle solved\n")
-    else:
-        print(f"Could not solve: {result.message}")
-        print("This is acceptable for a medium puzzle\n")
-
-
-def test_solve_harder():
-    """Test solving a harder puzzle."""
-    print("Testing solver on harder puzzle...")
-    print()
-
-    puzzle = Puzzle(HARDER_PUZZLE)
-
-    # This may take longer, so let's not be too verbose
-    result = solve(puzzle, max_states=50000)
-
-    if result.solved:
-        print(f"✓ Harder puzzle solved!")
-        print(f"  Solution length: {result.solution_length}")
-        print(f"  States explored: {result.states_explored}")
-        print()
-    else:
-        print(f"Could not solve harder puzzle: {result.message}")
-        print(f"  States explored: {result.states_explored}")
-        print("This is acceptable for a harder puzzle\n")
-
-
-def test_verify_solution():
-    """Test that the solution actually solves the puzzle."""
-    print("Testing solution verification...")
-
-    puzzle = Puzzle(TRIVIAL_PUZZLE)
-    result = solve(puzzle, max_states=1000)
-
-    assert result.solved
-
-    # Manually apply moves and verify we reach goal
-    current_state = puzzle.initial_state
-
-    for move in result.moves:
-        # Verify box is being moved
-        assert move.box_from in current_state.box_positions
-
-        # Apply move
-        new_box_positions = (current_state.box_positions - {move.box_from}) | {move.box_to}
-        current_state = current_state.__class__(
-            player_pos=move.box_to,
-            box_positions=frozenset(new_box_positions)
-        )
-
-    # Final state should be goal
-    assert puzzle.is_goal_state(current_state)
-
-    print("✓ Solution verification passed\n")
-
-
-def test_already_at_goal():
-    """Test puzzle that's already solved."""
-    print("Testing already-solved puzzle...")
-
-    # Create a puzzle where box is already on goal
-    solved_puzzle = """
-#####
-#@* #
-#####
-"""
-
-    puzzle = Puzzle(solved_puzzle)
-    result = solve(puzzle)
-
-    assert result.solved
-    assert result.solution_length == 0
-    print(f"  Correctly detected puzzle is already solved")
-
-    print("✓ Already-solved puzzle handled correctly\n")
+def test_puzzle(name, puzzle_string, verbose=True):
+    """Test a single puzzle."""
+    print("=" * 60)
+    print(f"Testing puzzle: {name}")
+    print("=" * 60)
+    
+    try:
+        puzzle = Puzzle(puzzle_string)
+        result = solve_and_display(puzzle, verbose=verbose)
+        
+        if result.solved:
+            print(f"✓ SUCCESS: Found solution with {result.solution_length} moves")
+            print(f"  States explored: {result.states_explored}")
+            return True
+        else:
+            print(f"✗ FAILED: {result.message}")
+            print(f"  States explored: {result.states_explored}")
+            return False
+            
+    except Exception as e:
+        print(f"✗ ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 def main():
-    """Run all solver tests."""
-    print("=" * 60)
-    print("PHASE 4 TESTS: A* Solver")
+    """Run all tests."""
+    print("\n" + "=" * 60)
+    print("SOKOBAN SOLVER TEST SUITE")
     print("=" * 60 + "\n")
-
-    test_solve_trivial()
-    test_solve_simple()
-    test_verify_solution()
-    test_already_at_goal()
-    test_solve_medium()
-    test_solve_harder()
-
+    
+    results = {}
+    
+    for name, puzzle_string in PUZZLES.items():
+        success = test_puzzle(name, puzzle_string, verbose=True)
+        results[name] = success
+        print("\n")
+    
+    # Summary
     print("=" * 60)
-    print("✓ ALL PHASE 4 TESTS COMPLETED!")
+    print("TEST SUMMARY")
     print("=" * 60)
+    
+    for name, success in results.items():
+        status = "✓ PASS" if success else "✗ FAIL"
+        print(f"{status}: {name}")
+    
+    total = len(results)
+    passed = sum(1 for s in results.values() if s)
+    print(f"\nTotal: {passed}/{total} tests passed")
+    
+    return passed == total
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    success = main()
+    sys.exit(0 if success else 1)

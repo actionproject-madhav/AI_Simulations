@@ -7,16 +7,16 @@
 #@$.#
 #####
 
-# Puzzle 2: Corner Test
+# Puzzle 2: Corner Test (4 moves)
 #######
 #  .  #
 # $@$ #
 #  .  #
 #######
 
-# Puzzle 3: Line Push
+# Puzzle 3: Line Push (6 moves)
 #########
-#   .   #
+#  ...  #
 # @ $$$ #
-#   ...##
+#       #
 #########
