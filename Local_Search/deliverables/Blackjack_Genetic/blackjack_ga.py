@@ -14,6 +14,8 @@ Target: ~42.3% raw win rate, ~46.5% fitness (with ties as 0.5)
 import numpy as np
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend for saving files
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import random
@@ -632,7 +634,7 @@ def plot_convergence(ga: GeneticAlgorithm, save_path: str = None):
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         print(f"Convergence plot saved to: {save_path}")
 
-    plt.show()
+    plt.close(fig)  # Close to free memory
 
 
 def plot_strategy_heatmap(ga: GeneticAlgorithm, save_path: str = None):
@@ -711,7 +713,7 @@ def plot_strategy_heatmap(ga: GeneticAlgorithm, save_path: str = None):
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
         print(f"Strategy heatmap saved to: {save_path}")
 
-    plt.show()
+    plt.close(fig)  # Close to free memory
 
 
 def print_best_strategy(strategy: Strategy):
