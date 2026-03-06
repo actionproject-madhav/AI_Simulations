@@ -1,0 +1,145 @@
+.board-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.coordinates-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-right: 5px;
+}
+
+.coordinates-left .coord {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b3b3b3;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.chessboard {
+  display: grid;
+  grid-template-columns: repeat(8, 60px);
+  grid-template-rows: repeat(8, 60px);
+  border: 3px solid #3d3d3d;
+  border-radius: 4px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.chessboard.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.ai-thinking-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.ai-thinking-message {
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.coordinates-bottom {
+  display: flex;
+  padding-left: 0;
+}
+
+.coordinates-bottom .coord {
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b3b3b3;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .chessboard {
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+  }
+
+  .coordinates-left .coord {
+    height: 50px;
+  }
+
+  .coordinates-bottom .coord {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chessboard {
+    grid-template-columns: repeat(8, 40px);
+    grid-template-rows: repeat(8, 40px);
+  }
+
+  .coordinates-left .coord {
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .coordinates-bottom .coord {
+    width: 40px;
+    font-size: 12px;
+  }
+}

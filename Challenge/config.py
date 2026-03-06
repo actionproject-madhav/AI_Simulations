@@ -1,18 +1,20 @@
 """
-Configuration for Buddha AI Application
+Configuration for Krishnamurti AI Application
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load .env from project root (same folder as config.py) so it works regardless of cwd
+_project_root = Path(__file__).resolve().parent
+load_dotenv(_project_root / ".env")
 
 class Config:
     """Application configuration."""
 
     # Flask
-    SECRET_KEY = os.getenv('SECRET_KEY', 'buddha-ai-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'krishnamurti-ai-secret-key-change-in-production')
     DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
     # OpenAI

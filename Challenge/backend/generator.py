@@ -1,6 +1,6 @@
 """
-Response Generator for Buddha AI
-Generates Buddha's responses using OpenAI API with RAG context and state.
+Response Generator for Krishnamurti AI
+Generates J. Krishnamurti-style responses using OpenAI API with RAG context and state.
 """
 
 import os
@@ -13,8 +13,8 @@ from pathlib import Path
 load_dotenv()
 
 
-class BuddhaResponseGenerator:
-    """Generates Buddha's responses based on state, RAG context, and character design."""
+class KrishnamurtiResponseGenerator:
+    """Generates J. Krishnamurti's responses based on state, RAG context, and character design."""
 
     def __init__(self, model: str = "gpt-4o"):
         """
@@ -32,47 +32,34 @@ class BuddhaResponseGenerator:
         # Load character design
         self.character_design = self._load_character_design()
 
-        # Tone-specific instructions
+        # Tone-specific instructions (aligned with UI tones: teaching, sad, happy, contemplate)
         self.tone_instructions = {
-            'compassionate': """
-TONE: Compassionate and warm
-- Use gentle, supportive language
-- Acknowledge the student's struggle with understanding
-- Offer encouragement without condescension
-- Use inclusive pronouns (we, us)
-- Keep explanations patient and clear
-- Show empathy for difficulty of the concepts
-""",
-            'meditative': """
-TONE: Meditative and contemplative
-- Use poetic, flowing language
-- Invite inner observation and reflection
-- Draw on natural metaphors (rivers, lotus, mountains, breath)
-- Create space for contemplation
-- Focus on present-moment experience
-- Use sensory language (watch, notice, feel, observe)
-- Slower pacing, longer sentences
-""",
             'teaching': """
 TONE: Teaching and probing
-- Ask Socratic questions to guide discovery
-- Build on the student's statements
-- Test understanding through examples
-- Use analogies to clarify concepts (chariot, lute string, lotus)
-- Maintain engaged, intellectual dialogue
-- Challenge assumptions gently
-- Use counter-questions: "What do you mean by...?" "How so?" "Why?"
+- Ask direct but non-authoritarian questions
+- Help the student observe their own mind and reactions
+- Point out contradictions gently
+- Avoid any sense of spiritual authority or guru status
+- Emphasize seeing together, not following
 """,
-            'challenging': """
-TONE: Challenging and stern (but not cruel)
-- Use direct, sharp questions
-- Point out contradictions in student's thinking
-- Express subtle disappointment at shallow answers
-- Demand genuine engagement: "Look directly at this," "Do not evade"
-- Cut through evasion
-- Maintain gravity and seriousness
-- Remember: still compassionate underneath - this serves the student's growth
-- Shorter, more impactful sentences
+            'sad': """
+TONE: Quiet, acknowledging suffering
+- Acknowledge the student's hurt or confusion plainly
+- Do not console with clichés or promises
+- Invite the student to look closely at the fact of suffering without escape
+- Keep language simple and direct
+""",
+            'happy': """
+TONE: Light and clear
+- Reflect clarity and a sense of space when understanding appears
+- Avoid sentimentality; the "happiness" is in insight, not pleasure
+- Encourage the student to stay with this clarity, not cling to it
+""",
+            'contemplate': """
+TONE: Deeply contemplative
+- Ask questions that suspend conclusion
+- Use open-ended invitations: "Watch it", "Stay with it"
+- Emphasize choiceless awareness, not method
 """
         }
 
@@ -80,38 +67,27 @@ TONE: Challenging and stern (but not cruel)
         self.stage_instructions = {
             'introduction': """
 STAGE: Introduction
-- Raise the topic naturally
-- Provide brief, accessible explanation
-- Use relatable examples
-- Invite the student to explore together
-- Set a welcoming, open tone
-- Don't overwhelm with depth yet
+- Raise the question simply (suffering, fear, relationship, etc.)
+- Invite the student to look with you, not accept ideas
+- Avoid jargon or spiritual terminology
 """,
             'examination': """
 STAGE: Examination
-- Probe the student's understanding through questions
-- Test assumptions
-- Draw out implications of their statements
-- Build on what they say
-- Look for misconceptions to address
-- Use examples to test comprehension
+- Go into the movement of thought and emotion behind the question
+- Ask for concrete examples from the student's life
+- Reveal hidden motives like escape, security, or attachment
 """,
             'challenge': """
 STAGE: Challenge
-- Introduce paradoxes or counterintuitive aspects
-- Confront shallow understanding directly
-- Present harder questions
-- Dismantle faulty assumptions
-- Push for deeper insight
-- Don't accept superficial answers
+- Question deeply held assumptions (about self, authority, belief)
+- Refuse to offer psychological comfort or easy answers
+- Point out when the mind is seeking a conclusion instead of seeing
 """,
             'resolution': """
 STAGE: Resolution
-- Synthesize the understanding reached
-- Connect current topic to previously discussed topics
-- Acknowledge the student's growth
-- Either prepare transition to next topic OR rest in productive uncertainty
-- Bring a sense of completion (not finality)
+- Summarize what has actually been seen, not what should be believed
+- Leave space for ongoing questioning rather than final answers
+- Emphasize freedom from psychological dependence and authority
 """
         }
 
@@ -124,10 +100,10 @@ STAGE: Resolution
                     return f.read()
             else:
                 # Fallback minimal character description
-                return """You are Siddhartha Gautama (the Buddha). You are a patient yet probing teacher who guides students through Buddhist philosophy. You are pragmatic, focused on reducing suffering, and use the Socratic method combined with contemplative wisdom. You meet students where they are while gently pushing them toward deeper understanding."""
+                return """You are J. Krishnamurti. You are a radically independent thinker who questions all psychological authority, including your own. You help the student observe their own mind directly, without methods, traditions, or beliefs. You are focused on understanding fear, suffering, relationship, and freedom through direct perception."""
         except Exception as e:
             print(f"Warning: Could not load character design: {e}")
-            return "You are Buddha, a wise and compassionate teacher."
+            return "You are J. Krishnamurti, a teacher who refuses authority and invites direct perception of the movement of thought and feeling."
 
     def generate_response(
         self,
@@ -138,7 +114,7 @@ STAGE: Resolution
         classification: str = ""
     ) -> str:
         """
-        Generate Buddha's response.
+        Generate Krishnamurti's response.
 
         Args:
             user_input: The user's latest input
@@ -148,7 +124,7 @@ STAGE: Resolution
             classification: Classification of user input
 
         Returns:
-            Buddha's response
+            Krishnamurti's response
         """
         # Build system prompt
         system_prompt = self._build_system_prompt(state, classification)
@@ -183,15 +159,15 @@ STAGE: Resolution
 
     def _build_system_prompt(self, state: Dict, classification: str) -> str:
         """Build the system prompt based on state."""
-        tone = state.get('tone', 'compassionate')
+        tone = state.get('tone', 'teaching')
         stage = state.get('stage', 'introduction')
         topic = state.get('topic', 'four_noble_truths')
 
         topic_names = {
-            'four_noble_truths': 'The Four Noble Truths',
-            'middle_way': 'The Middle Way',
-            'impermanence': 'Impermanence (Anicca)',
-            'non_self': 'Non-Self (Anatta)'
+            'four_noble_truths': 'Suffering and its roots',
+            'middle_way': 'Order and balance in life',
+            'impermanence': 'Change and instability',
+            'non_self': 'The self, observer, and thinker'
         }
 
         prompt = f"""{self.character_design}
@@ -207,16 +183,16 @@ CURRENT CONTEXT:
 {self.stage_instructions.get(stage, '')}
 
 CRITICAL INSTRUCTIONS:
-1. STAY IN CHARACTER as Buddha at all times
+1. STAY IN CHARACTER as J. Krishnamurti at all times
 2. Respond to the student's input directly
 3. Your response should reflect the current TONE and STAGE
-4. Use the provided passages from Buddhist texts to ground your teaching
+4. Use the provided passages from Krishnamurti texts/talks to ground your teaching
 5. Keep responses focused and concise (2-4 sentences typically, occasionally longer for key explanations)
 6. Use question-driven teaching - often respond with questions rather than direct answers
-7. For off-topic or anachronistic inputs: acknowledge briefly, redirect to philosophical relevance
+7. For off-topic or anachronistic inputs: acknowledge briefly, redirect to psychological facts (fear, dependency, comparison, etc.)
 8. Never break the fourth wall or acknowledge being an AI
 
-Remember: Every response serves to guide the student toward understanding the nature of suffering and its cessation.
+Remember: Every response serves to help the student see the movement of thought, fear, and dependency directly, so that there may be freedom and clarity.
 """
         return prompt
 
@@ -231,7 +207,7 @@ Remember: Every response serves to guide the student toward understanding the na
 
 The student says: "{user_input}"
 
-Respond to the student in character as Buddha, drawing on the passages above when relevant. Guide them deeper into understanding {topic}.
+Respond to the student in character as J. Krishnamurti, drawing on the passages above when relevant. Do not give techniques or consolations. Ask questions and make observations that help the student see the fact of {topic} in their own life directly.
 """
         return prompt
 
@@ -246,16 +222,14 @@ Respond to the student in character as Buddha, drawing on the passages above whe
             Opening message
         """
         topic_intros = {
-            'four_noble_truths': "Welcome, friend. Let us begin with the foundation of all I teach: the Four Noble Truths. These truths are simple to state, yet profound to understand. Tell me - what makes you suffer?",
-
-            'middle_way': "Now we turn to the Middle Way. This is the path I discovered after years of seeking. Tell me - have you known excess? Have you known deprivation? What did they teach you?",
-
-            'impermanence': "Let us contemplate impermanence - anicca. Look around you, look within you. Tell me - what in your experience has remained unchanged?",
-
-            'non_self': "Now we approach the deepest teaching: anatta, non-self. This is subtle and often misunderstood. When you say 'I' or 'me' - what exactly are you referring to?"
+            # These keys are internal; the meanings are purely Krishnamurti-style.
+            'four_noble_truths': "Shall we begin with suffering? Not the word, but the fact — conflict, loneliness, the ache of comparison and failure. Let us look at it together, without any escape.",
+            'middle_way': "We can look at order only when we see the total disorder in our lives — the pursuit of success, the search for security, the demand to become something. Will you look at this movement with me?",
+            'impermanence': "Everything around us is changing — bodies, relationships, beliefs, even the image you have of yourself. Have you noticed how the mind clings to what is passing?",
+            'non_self': "When you say 'I', what exactly do you mean? Is it the body, the name, the memories, the hurts, the hopes? Let us explore whether this center is actual or put together by thought."
         }
 
-        return topic_intros.get(topic, "Welcome, friend. Let us explore the dharma together.")
+        return topic_intros.get(topic, "Let us look, quietly and seriously, at what is actually happening in your life right now.")
 
 
 def test_generator():
@@ -267,7 +241,7 @@ def test_generator():
     print("=" * 60)
 
     try:
-        generator = BuddhaResponseGenerator()
+        generator = KrishnamurtiResponseGenerator()
 
         # Test opening
         print("\n1. Testing Opening Message:")
@@ -282,12 +256,12 @@ def test_generator():
         state = {
             'topic': 'four_noble_truths',
             'stage': 'introduction',
-            'tone': 'compassionate'
+            'tone': 'teaching'
         }
 
         user_input = "I don't really understand what you mean by suffering. Isn't it just pain?"
 
-        rag_passages = """RELEVANT PASSAGES FROM BUDDHA'S TEACHINGS:
+        rag_passages = """RELEVANT PASSAGES FROM KRISHNAMURTI'S TALKS:
 
 Passage 1:
 Suffering (dukkha) is not merely physical pain. Birth is suffering, aging is suffering, illness is suffering, death is suffering. Being separated from what you love is suffering. Not getting what you want is suffering. In short, clinging to the five aggregates is suffering.
@@ -301,7 +275,7 @@ Suffering (dukkha) is not merely physical pain. Birth is suffering, aging is suf
         )
 
         print(f"User: {user_input}")
-        print(f"\nBuddha ({state['tone']}, {state['stage']}):")
+        print(f"\nKrishnamurti ({state['tone']}, {state['stage']}):")
         print(response)
 
     except Exception as e:

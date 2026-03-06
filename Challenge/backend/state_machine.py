@@ -1,5 +1,5 @@
 """
-State Machine for Buddha AI Conversation
+State Machine for Krishnamurti AI Conversation
 Manages topic, stage, and tone transitions based on user interactions.
 """
 
@@ -13,7 +13,7 @@ class ConversationState:
     """Represents the current state of the conversation."""
     topic: str = "four_noble_truths"  # Current philosophical topic
     stage: str = "introduction"        # introduction/examination/challenge/resolution
-    tone: str = "compassionate"        # compassionate/meditative/teaching/challenging
+    tone: str = "teaching"             # teaching/sad/happy/contemplate
     turn_count: int = 0                # Number of turns in conversation
     topic_turn_count: int = 0          # Number of turns in current topic
     topics_covered: List[str] = None   # Topics already discussed
@@ -32,32 +32,35 @@ class ConversationState:
         return cls(**data)
 
 
-class BuddhaStateMachine:
-    """Manages conversation state transitions for Buddha AI."""
+class KrishnamurtiStateMachine:
+    """Manages conversation state transitions for Krishnamurti AI."""
 
     # Topic configuration
     TOPICS = {
         'four_noble_truths': {
-            'name': 'The Four Noble Truths',
-            'keywords': ['four noble truths', 'dukkha', 'suffering', 'tanha', 'craving', 'cessation'],
+            # Interpreted in Krishnamurti style as the fact of suffering and its roots,
+            # not as a doctrinal list.
+            'name': 'Suffering and its roots',
+            'keywords': ['suffering', 'conflict', 'loneliness', 'comparison', 'fear'],
             'next_topics': ['middle_way', 'impermanence'],
             'difficulty': 1
         },
         'middle_way': {
-            'name': 'The Middle Way',
-            'keywords': ['middle way', 'middle path', 'extremes', 'balance', 'moderation'],
+            # Interpreted as order and balance in daily life, not a Buddhist path.
+            'name': 'Order and balance in life',
+            'keywords': ['order', 'disorder', 'balance', 'extremes', 'security'],
             'next_topics': ['impermanence', 'non_self'],
             'difficulty': 2
         },
         'impermanence': {
-            'name': 'Impermanence (Anicca)',
-            'keywords': ['impermanence', 'anicca', 'change', 'flux', 'transient'],
+            'name': 'Change and instability',
+            'keywords': ['change', 'instability', 'loss', 'time', 'becoming'],
             'next_topics': ['non_self'],
             'difficulty': 3
         },
         'non_self': {
-            'name': 'Non-Self (Anatta)',
-            'keywords': ['anatta', 'non-self', 'no-self', 'skandhas', 'aggregates'],
+            'name': 'Self and the observer',
+            'keywords': ['self', 'observer', 'center', 'ego', 'image'],
             'next_topics': [],  # Terminal node
             'difficulty': 4
         }
@@ -66,15 +69,19 @@ class BuddhaStateMachine:
     # Stage progression rules
     STAGES = ['introduction', 'examination', 'challenge', 'resolution']
 
-    # Tone transition rules
+    # Tone transition rules (mapped from classifier categories)
     TONE_TRANSITIONS = {
-        'expresses_confusion': 'compassionate',
-        'asks_clarifying_question': 'teaching',
-        'demonstrates_understanding': 'teaching',
-        'insightful_response': 'meditative',
-        'minimal_answer': 'challenging',
-        'evasive_answer': 'challenging',
-        'off_topic': 'challenging',
+        # Student is struggling or vulnerable → more "sad"/soft teaching
+        'expresses_confusion': 'sad',
+        # Active learning and insight → "happy"
+        'asks_clarifying_question': 'happy',
+        'demonstrates_understanding': 'happy',
+        # Deep insight/reflection → "contemplate"
+        'insightful_response': 'contemplate',
+        # Low-effort or evasive → firmer "teaching" tone
+        'minimal_answer': 'teaching',
+        'evasive_answer': 'teaching',
+        'off_topic': 'teaching',
     }
 
     def __init__(self):
@@ -100,19 +107,19 @@ class BuddhaStateMachine:
 
         # Special rules based on current stage
         if self.state.stage == 'introduction':
-            # Prefer compassionate or teaching in introduction
-            if new_tone == 'challenging':
-                new_tone = 'teaching'
+            # Prefer gentler tones at the beginning
+            if new_tone == 'teaching':
+                new_tone = 'happy'
 
         elif self.state.stage == 'challenge':
-            # Allow challenging and meditative in challenge stage
-            if new_tone == 'compassionate' and classification != 'expresses_confusion':
+            # Allow more direct teaching during challenge stage
+            if new_tone == 'sad' and classification != 'expresses_confusion':
                 new_tone = 'teaching'
 
         elif self.state.stage == 'resolution':
-            # Prefer meditative or compassionate in resolution
-            if new_tone == 'challenging':
-                new_tone = 'meditative'
+            # Prefer contemplative or happy in resolution
+            if new_tone == 'teaching':
+                new_tone = 'contemplate'
 
         self.state.tone = new_tone
         return new_tone
@@ -298,10 +305,10 @@ class BuddhaStateMachine:
 def test_state_machine():
     """Test the state machine."""
     print("=" * 60)
-    print("Testing Buddha State Machine")
+    print("Testing Krishnamurti State Machine")
     print("=" * 60)
 
-    sm = BuddhaStateMachine()
+    sm = KrishnamurtiStateMachine()
 
     # Simulate a conversation
     test_sequence = [

@@ -1,42 +1,44 @@
 """
-RAG System for Buddha AI
-Vector database using ChromaDB for semantic retrieval of Buddhist texts.
+RAG System for Krishnamurti AI
+Vector database using ChromaDB for semantic retrieval of J. Krishnamurti texts.
 """
 
 import chromadb
 from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
 from typing import List, Dict
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-from text_chunker import TextChunker
+from backend.text_chunker import TextChunker
+
+# Ensure .env from project root is loaded even when running this module directly
+_project_root = Path(__file__).resolve().parent.parent
+load_dotenv(_project_root / ".env")
 
 
-class BuddhaRAG:
-    """RAG system for retrieving relevant Buddhist text passages."""
+class KrishnamurtiRAG:
+    """RAG system for retrieving relevant Krishnamurti text passages."""
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", persist_dir: str = "data/chroma"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         """
         Initialize the RAG system.
 
         Args:
-            model_name: Sentence transformer model to use for embeddings
-            persist_dir: Directory to persist the vector database
+            model_name: Sentence transformer model to use for embeddings (used by ChromaDB)
         """
         self.model_name = model_name
-        self.persist_dir = persist_dir
 
-        # Initialize sentence transformer model
-        print(f"Loading embedding model: {model_name}")
-        self.encoder = SentenceTransformer(model_name)
-
-        # Initialize ChromaDB client
-        Path(persist_dir).mkdir(parents=True, exist_ok=True)
-        self.client = chromadb.PersistentClient(path=persist_dir)
+        # Initialize ChromaDB Cloud client
+        print("Connecting to Chroma Cloud...")
+        self.client = chromadb.CloudClient(
+            api_key=os.getenv('CHROMA_API_KEY'),
+            tenant=os.getenv('CHROMA_TENANT'),
+            database=os.getenv('CHROMA_DATABASE')
+        )
 
         # Collection name
-        self.collection_name = "buddha_texts"
+        self.collection_name = "krishnamurti_texts"
         self.collection = None
 
     def initialize_database(self, force_rebuild: bool = False):
@@ -65,7 +67,7 @@ class BuddhaRAG:
             print("Creating new collection...")
             self.collection = self.client.create_collection(
                 name=self.collection_name,
-                metadata={"description": "Buddhist texts for Buddha AI"}
+                metadata={"description": "J. Krishnamurti texts for Krishnamurti AI"}
             )
 
             # Load and process texts
@@ -159,12 +161,12 @@ class BuddhaRAG:
         Returns:
             Formatted string of relevant passages for prompt
         """
-        # Map topics to keywords
+        # Map topics to keywords (kept generic and Krishnamurti-style)
         topic_keywords = {
-            'four_noble_truths': ['suffering', 'dukkha', 'noble truths', 'craving', 'tanha'],
-            'middle_way': ['middle way', 'middle path', 'extremes', 'moderation'],
-            'impermanence': ['impermanence', 'anicca', 'change', 'flux', 'transient'],
-            'non_self': ['anatta', 'non-self', 'no-self', 'self', 'soul', 'atman']
+            'four_noble_truths': ['suffering', 'conflict', 'fear', 'loneliness'],
+            'middle_way': ['order', 'disorder', 'balance', 'security'],
+            'impermanence': ['change', 'instability', 'loss', 'time'],
+            'non_self': ['self', 'observer', 'thinker', 'ego', 'image']
         }
 
         # Get keywords for this topic
@@ -184,7 +186,7 @@ class BuddhaRAG:
         if not results:
             return "No relevant passages found."
 
-        formatted = "RELEVANT PASSAGES FROM BUDDHA'S TEACHINGS:\n\n"
+        formatted = "RELEVANT PASSAGES FROM KRISHNAMURTI'S TALKS:\n\n"
         for i, result in enumerate(results, 1):
             formatted += f"Passage {i} (from {result['metadata']['source']}):\n"
             formatted += f"{result['text']}\n\n"
@@ -195,11 +197,11 @@ class BuddhaRAG:
 def test_rag_system():
     """Test the RAG system."""
     print("=" * 60)
-    print("Testing Buddha RAG System")
+    print("Testing Krishnamurti RAG System")
     print("=" * 60)
 
     # Initialize RAG
-    rag = BuddhaRAG()
+    rag = KrishnamurtiRAG()
     rag.initialize_database(force_rebuild=False)
 
     # Test queries

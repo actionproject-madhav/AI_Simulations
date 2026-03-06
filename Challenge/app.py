@@ -1,5 +1,5 @@
 """
-Flask Backend for Buddha AI
+Flask Backend for Krishnamurti AI
 Main application server integrating RAG, state machine, classifier, and generator.
 """
 
@@ -9,15 +9,15 @@ import os
 from pathlib import Path
 
 from config import Config, validate_config
-from backend.rag_system import BuddhaRAG
-from backend.state_machine import BuddhaStateMachine, ConversationState
+from backend.rag_system import KrishnamurtiRAG
+from backend.state_machine import KrishnamurtiStateMachine, ConversationState
 from backend.classifier import UserInputClassifier
-from backend.generator import BuddhaResponseGenerator
+from backend.generator import KrishnamurtiResponseGenerator
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='static', static_url_path='')
 app.config.from_object(Config)
-CORS(app)  # Enable CORS for React frontend
+CORS(app, origins=["http://localhost:3000"], allow_headers=["Content-Type"], supports_credentials=False)  # React dev server
 
 # Global components (initialized on first request)
 rag_system = None
@@ -38,9 +38,8 @@ def init_components():
 
     if rag_system is None:
         print("Initializing RAG system...")
-        rag_system = BuddhaRAG(
-            model_name=Config.EMBEDDING_MODEL,
-            persist_dir=Config.CHROMA_PERSIST_DIR
+        rag_system = KrishnamurtiRAG(
+            model_name=Config.EMBEDDING_MODEL
         )
         rag_system.initialize_database(force_rebuild=False)
 
@@ -50,14 +49,14 @@ def init_components():
 
     if generator is None:
         print("Initializing generator...")
-        generator = BuddhaResponseGenerator(model=Config.OPENAI_MODEL_GENERATOR)
+        generator = KrishnamurtiResponseGenerator(model=Config.OPENAI_MODEL_GENERATOR)
 
 
 def get_session(session_id: str) -> dict:
     """Get or create a session."""
     if session_id not in sessions:
         sessions[session_id] = {
-            'state_machine': BuddhaStateMachine(),
+            'state_machine': KrishnamurtiStateMachine(),
             'history': []  # Conversation history
         }
     return sessions[session_id]
@@ -72,7 +71,7 @@ def index():
         return send_from_directory('frontend/build', 'index.html')
     else:
         return jsonify({
-            'message': 'Buddha AI Backend Running',
+            'message': 'Krishnamurti AI Backend Running',
             'status': 'Frontend not built yet. Run: cd frontend && npm run build'
         })
 
@@ -88,7 +87,7 @@ def start_conversation():
 
         # Create new session
         session = get_session(session_id)
-        session['state_machine'] = BuddhaStateMachine()
+        session['state_machine'] = KrishnamurtiStateMachine()
         session['history'] = []
 
         # Get opening message
@@ -257,7 +256,7 @@ def serve_image(filename):
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("Buddha AI - Starting Server")
+    print("Krishnamurti AI - Starting Server")
     print("=" * 60)
 
     # Validate config
@@ -267,7 +266,7 @@ if __name__ == '__main__':
         exit(1)
 
     # Run server
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5001))  # 5001 to avoid macOS AirPlay using 5000
     print(f"\nServer running on http://localhost:{port}")
     print("=" * 60)
 

@@ -1,6 +1,6 @@
 """
-Text Chunker for Buddha AI RAG System
-Loads Buddhist texts and splits them into overlapping chunks for vector database.
+Text Chunker for Krishnamurti AI RAG System
+Loads Krishnamurti texts and splits them into overlapping chunks for vector database.
 """
 
 import os
@@ -133,12 +133,13 @@ class TextChunker:
         texts = self.load_texts()
         all_chunks = []
 
-        # Define topic keywords for different sources
+        # Define topic keywords for different sources (filenames are stems of .txt files)
+        # These are intentionally generic so they work with Krishnamurti talks/books.
         topic_mapping = {
-            'Dhammapada': ['four noble truths', 'suffering', 'middle way',
-                          'impermanence', 'non-self', 'dharma', 'mindfulness'],
-            'sayings': ['four noble truths', 'suffering', 'middle way',
-                       'impermanence', 'non-self', 'teaching', 'wisdom']
+            # Example: "freedom_from_the_known.txt" → "freedom_from_the_known"
+            'freedom_from_the_known': ['fear', 'freedom', 'conditioning', 'authority'],
+            'commentaries_on_living': ['relationship', 'love', 'conflict', 'suffering'],
+            'education_and_the_significance_of_life': ['education', 'learning', 'order', 'discipline'],
         }
 
         for source_name, text in texts.items():

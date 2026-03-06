@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
-const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5001';
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -41,7 +41,7 @@ function App() {
       const data = await response.json();
 
       if (data.success) {
-        setMessages([{ role: 'buddha', content: data.message }]);
+        setMessages([{ role: 'krishnamurti', content: data.message }]);
         setState(data.state);
       } else {
         setMessages([{ role: 'system', content: `Error: ${data.error}` }]);
@@ -76,7 +76,7 @@ function App() {
       const data = await response.json();
 
       if (data.success) {
-        setMessages(prev => [...prev, { role: 'buddha', content: data.message }]);
+        setMessages(prev => [...prev, { role: 'krishnamurti', content: data.message }]);
         setState(data.state);
       } else {
         setMessages(prev => [...prev, { role: 'system', content: `Error: ${data.error}` }]);
@@ -109,35 +109,36 @@ function App() {
 
   const getImageForTone = (tone) => {
     const toneImages = {
-      'compassionate': '/images/compassionate.jpg',
-      'meditative': '/images/meditative.jpeg',
-      'teaching': '/images/teaching.webp',
-      'challenging': '/images/challenging.jpeg'
+      'teaching': '/images/teaching.png',
+      'sad': '/images/sad.png',
+      'happy': '/images/happy.png',
+      'contemplate': '/images/contemplate.png'
     };
-    return toneImages[tone] || toneImages['compassionate'];
+    const path = toneImages[tone] || toneImages['teaching'];
+    return `${API_BASE}${path}`;
   };
 
   const topicNames = {
-    'four_noble_truths': 'The Four Noble Truths',
-    'middle_way': 'The Middle Way',
-    'impermanence': 'Impermanence',
-    'non_self': 'Non-Self'
+    'four_noble_truths': 'Suffering and its roots',
+    'middle_way': 'Order and balance in life',
+    'impermanence': 'Change and instability',
+    'non_self': 'Self and the observer'
   };
 
   return (
     <div className="app">
       <div className="sidebar">
         <div className="sidebar-header">
-          <h1>Buddha</h1>
-          <p className="subtitle">A Philosophical Dialogue</p>
+          <h1>J. Krishnamurti</h1>
+          <p className="subtitle">A Dialogue in Inquiry</p>
         </div>
 
         {state && (
-          <div className="buddha-image-container">
+          <div className="teacher-image-container">
             <img
               src={getImageForTone(state.tone)}
-              alt={`Buddha - ${state.tone}`}
-              className="buddha-image"
+              alt={`Krishnamurti - ${state.tone}`}
+              className="teacher-image"
             />
             <div className="image-label">{state.tone}</div>
           </div>
@@ -166,7 +167,7 @@ function App() {
 
         <div className="sidebar-footer">
           <p>Respond thoughtfully.</p>
-          <p>Buddha will guide you through core Buddhist concepts.</p>
+          <p>Krishnamurti will question fear, suffering, and the self with you.</p>
         </div>
       </div>
 
@@ -175,7 +176,7 @@ function App() {
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.role}`}>
               <div className="message-label">
-                {msg.role === 'user' ? 'You' : msg.role === 'buddha' ? 'Buddha' : 'System'}
+                {msg.role === 'user' ? 'You' : msg.role === 'krishnamurti' ? 'Krishnamurti' : 'System'}
               </div>
               <div className="message-content">
                 {msg.content}
@@ -184,8 +185,8 @@ function App() {
           ))}
 
           {loading && (
-            <div className="message buddha">
-              <div className="message-label">Buddha</div>
+            <div className="message krishnamurti">
+              <div className="message-label">Krishnamurti</div>
               <div className="message-content loading">
                 <span className="loading-dot">.</span>
                 <span className="loading-dot">.</span>

@@ -1,0 +1,154 @@
+.square {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.square.light {
+  background-color: #EEEED2;
+}
+
+.square.dark {
+  background-color: #769656;
+}
+
+.square.selected {
+  background-color: #BACA44 !important;
+  box-shadow: inset 0 0 0 3px rgba(186, 202, 68, 0.8);
+}
+
+.square.in-check {
+  background-color: #e74c3c !important;
+  box-shadow: inset 0 0 0 3px rgba(231, 76, 60, 0.8);
+  animation: check-pulse 1s ease-in-out infinite;
+}
+
+@keyframes check-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 3px rgba(231, 76, 60, 0.8);
+  }
+  50% {
+    box-shadow: inset 0 0 0 5px rgba(231, 76, 60, 1);
+  }
+}
+
+.square.possible-move {
+  cursor: pointer;
+}
+
+.square:hover {
+  filter: brightness(0.95);
+}
+
+.piece {
+  font-size: 48px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.piece-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 2;
+  transition: transform 0.1s ease;
+}
+
+.square:active .piece {
+  transform: scale(0.95);
+}
+
+.square:active .piece-image {
+  transform: scale(0.95);
+}
+
+.piece.piece-white {
+  color: #ffffff;
+  text-shadow:
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 2px rgba(0, 0, 0, 0.6),
+    0 0 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+
+.piece.piece-black {
+  color: #000000;
+  text-shadow:
+    1px 1px 2px rgba(255, 255, 255, 0.5),
+    -1px -1px 2px rgba(255, 255, 255, 0.3);
+  font-weight: bold;
+}
+
+.move-dot {
+  width: 20%;
+  height: 20%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.capture-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 85%;
+  border: 4px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.square.dark .move-dot {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.square.light .move-dot {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.square.dark .capture-ring {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.square.light .capture-ring {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .square {
+    width: 50px;
+    height: 50px;
+  }
+
+  .piece {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .square {
+    width: 40px;
+    height: 40px;
+  }
+
+  .piece {
+    font-size: 32px;
+  }
+
+  .move-dot {
+    width: 18%;
+    height: 18%;
+  }
+}

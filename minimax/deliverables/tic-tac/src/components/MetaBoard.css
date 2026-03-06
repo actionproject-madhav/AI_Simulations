@@ -1,0 +1,29 @@
+.meta-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+  background-color: #1a1816;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive sizing */
+@media (max-width: 768px) {
+  .meta-board {
+    max-width: 500px;
+    padding: 12px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meta-board {
+    max-width: 100%;
+    padding: 8px;
+    gap: 4px;
+  }
+}

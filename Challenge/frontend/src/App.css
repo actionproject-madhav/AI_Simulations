@@ -36,13 +36,13 @@
   font-weight: 300;
 }
 
-/* Buddha Image */
-.buddha-image-container {
+/* Teacher Image */
+.teacher-image-container {
   margin-bottom: 2rem;
   text-align: center;
 }
 
-.buddha-image {
+.teacher-image {
   width: 100%;
   height: auto;
   border: 2px solid #ffffff;
@@ -159,12 +159,12 @@
   color: #000000;
 }
 
-.message.buddha .message-label {
+.message.krishnamurti .message-label {
   color: #000000;
   font-weight: bold;
 }
 
-.message.buddha .message-content {
+.message.krishnamurti .message-content {
   border-left: 3px solid #000000;
   padding-left: 1.5rem;
 }
@@ -287,13 +287,13 @@
     border-bottom: 2px solid #000000;
   }
 
-  .buddha-image-container {
+  .teacher-image-container {
     display: flex;
     align-items: center;
     gap: 1rem;
   }
 
-  .buddha-image {
+  .teacher-image {
     width: 80px;
     height: 80px;
     object-fit: cover;

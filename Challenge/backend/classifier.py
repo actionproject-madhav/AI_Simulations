@@ -1,5 +1,5 @@
 """
-LLM-based Classifier for Buddha AI
+LLM-based Classifier for Krishnamurti AI
 Classifies user inputs to drive state machine transitions.
 """
 
@@ -53,7 +53,7 @@ class UserInputClassifier:
         """
         categories_desc = "\n".join([f"- {cat}: {desc}" for cat, desc in self.CATEGORIES.items()])
 
-        prompt = f"""You are classifying user responses in a philosophical dialogue with Buddha.
+        prompt = f"""You are classifying user responses in a philosophical dialogue with J. Krishnamurti.
 
 CLASSIFICATION CATEGORIES:
 {categories_desc}
@@ -122,7 +122,7 @@ Return ONLY the category name, nothing else."""
         try:
             categories_desc = "\n".join([f"- {cat}: {desc}" for cat, desc in self.CATEGORIES.items()])
 
-            prompt = f"""You are classifying user responses in a philosophical dialogue with Buddha.
+            prompt = f"""You are classifying user responses in a philosophical dialogue with J. Krishnamurti.
 
 CLASSIFICATION CATEGORIES:
 {categories_desc}

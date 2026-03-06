@@ -1,0 +1,99 @@
+.local-board {
+  position: relative;
+  padding: 4px;
+  background-color: #34495e;
+  border: 2px solid #34495e;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.local-board-active {
+  border-color: #f39c12; /* Orange highlight for active board */
+  box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(243, 156, 18, 0.8);
+  }
+}
+
+.local-board-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  aspect-ratio: 1;
+  background-color: #34495e;
+}
+
+.local-board-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  animation: overlayFadeIn 0.5s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.local-board-winner {
+  font-size: 4rem;
+  font-weight: bold;
+  opacity: 0.9;
+}
+
+.local-board-overlay-x .local-board-winner {
+  color: #e74c3c; /* Red for X */
+}
+
+.local-board-overlay-o .local-board-winner {
+  color: #3498db; /* Blue for O */
+}
+
+.local-board-overlay-draw .local-board-winner {
+  color: #95a5a6; /* Gray for draw */
+  font-size: 2rem;
+}
+
+.local-board-won {
+  opacity: 0.8;
+}
+
+/* Responsive sizing */
+@media (max-width: 768px) {
+  .local-board-winner {
+    font-size: 3rem;
+  }
+
+  .local-board-overlay-draw .local-board-winner {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .local-board-winner {
+    font-size: 2rem;
+  }
+
+  .local-board-overlay-draw .local-board-winner {
+    font-size: 1rem;
+  }
+}
