@@ -7,7 +7,7 @@ import {
   isStalemate,
   getPieceColor,
   getPieceType,
-} from './chessEngine';
+} from './chessEngine.js';
 
 // Piece values for evaluation
 const PIECE_VALUES = {

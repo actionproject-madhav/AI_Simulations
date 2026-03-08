@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "simulate": "node run-simulation.js",
+    "simulate:quick": "node run-simulation.js --quick",
+    "simulate:tournament": "node run-simulation.js --tournament --games 50"
   },
   "dependencies": {
     "react": "^19.2.0",
