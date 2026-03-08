@@ -112,6 +112,22 @@
   font-size: 14px;
 }
 
+/* Compact mode for multi-board layout - sized to fit 3 boards + sidebar in viewport */
+.board-wrapper.compact .chessboard {
+  grid-template-columns: repeat(8, 38px);
+  grid-template-rows: repeat(8, 38px);
+}
+
+.board-wrapper.compact .coordinates-left .coord {
+  height: 38px;
+  font-size: 10px;
+}
+
+.board-wrapper.compact .coordinates-bottom .coord {
+  width: 38px;
+  font-size: 10px;
+}
+
 @media (max-width: 768px) {
   .chessboard {
     grid-template-columns: repeat(8, 50px);
