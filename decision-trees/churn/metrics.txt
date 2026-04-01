@@ -1,0 +1,28 @@
+Telco Churn Metrics
+===================
+Rows: 7043
+Overall churn rate: 0.265
+Train size: 5634
+Test size: 1409
+Balanced train counts (SMOTE): {0: 4139, 1: 4139}
+
+Model comparison (higher is better):
+                 model  cv_roc_auc  test_roc_auc  precision_churn  recall_churn  f1_churn
+        LGBMClassifier    0.869936      0.861412         0.545936      0.826203  0.657447
+         XGBClassifier    0.868287      0.861225         0.540210      0.826203  0.653277
+RandomForestClassifier    0.850476      0.860393         0.519608      0.850267  0.645030
+    StackingClassifier    0.869044      0.856332         0.518395      0.828877  0.637860
+DecisionTreeClassifier    0.836512      0.831126         0.512195      0.786096  0.620253
+
+Best model: LGBMClassifier
+
+Confusion matrix for best model (rows=true, cols=pred):
+[[778 257]
+ [ 65 309]]
+
+Precision (churn=1): 0.5459
+Recall (churn=1): 0.8262
+F1 (churn=1): 0.6574
+CV ROC-AUC: 0.8699
+Test ROC-AUC (from predicted labels): 0.8614
+Best ROC-AUC from probabilities: 0.8614

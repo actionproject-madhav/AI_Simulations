@@ -8,7 +8,7 @@
   justify-content: center;
   cursor: pointer;
   position: relative;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
 }
 
@@ -51,7 +51,7 @@
 .piece {
   font-size: 48px;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   z-index: 2;
 }
@@ -62,7 +62,7 @@
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
-  transition: transform 0.1s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .square:active .piece {

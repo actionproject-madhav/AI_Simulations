@@ -23,7 +23,7 @@
   font-weight: 600;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   z-index: 999;
-  animation: fadeInScale 0.3s ease-out;
+  animation: fadeInScale 0.5s ease-out;
   border: 2px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
 }
@@ -41,7 +41,7 @@
   font-weight: 700;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  animation: slideInDown 0.4s ease-out;
+  animation: slideInDown 0.6s ease-out;
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -227,7 +227,7 @@
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-  transition: all 0.3s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .board-card.active {
@@ -292,6 +292,37 @@
   box-shadow: 0 2px 8px rgba(129, 182, 76, 0.4);
 }
 
+.winner-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.winner-badge.winner-white {
+  background: #f0f0f0;
+  color: #1a1816;
+  box-shadow: 0 2px 8px rgba(240, 240, 240, 0.4);
+}
+
+.winner-badge.winner-black {
+  background: #333;
+  color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(51, 51, 51, 0.4);
+}
+
+.winner-badge.winner-draw {
+  background: #95a5a6;
+  color: #1a1816;
+  box-shadow: 0 2px 8px rgba(149, 165, 166, 0.4);
+}
+
+.score-display {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+}
+
 .board-with-state {
   display: flex;
   flex-direction: column;
@@ -308,7 +339,7 @@
   text-align: center;
   width: 100%;
   box-sizing: border-box;
-  transition: all 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .turn-indicator-banner.human-turn {

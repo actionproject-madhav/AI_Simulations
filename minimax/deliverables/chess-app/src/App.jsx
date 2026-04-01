@@ -26,8 +26,25 @@ function App() {
   const [showRandomizationNotice, setShowRandomizationNotice] = useState(false)
   const [turnPairComplete, setTurnPairComplete] = useState(false)
 
+  // Best-of-3 tracking: [board1Winner, board2Winner, board3Winner] - null, 'white', 'black', or 'draw'
+  const [boardWinners, setBoardWinners] = useState([null, null, null])
+  const [whiteWins, setWhiteWins] = useState(0)
+  const [blackWins, setBlackWins] = useState(0)
+
   const pickRandomBoardAndSide = useCallback(() => {
-    const newBoard = pickRandomBoard()
+    // Find unfinished boards
+    const unfinishedBoards = boardWinners
+      .map((winner, idx) => (winner === null ? idx : null))
+      .filter((idx) => idx !== null)
+
+    // If no unfinished boards, don't randomize (game should be over)
+    if (unfinishedBoards.length === 0) {
+      console.log('No unfinished boards remaining')
+      return
+    }
+
+    // Pick random unfinished board
+    const newBoard = unfinishedBoards[Math.floor(Math.random() * unfinishedBoards.length)]
     const newColor = pickRandomSide()
     const aiColor = newColor === 'white' ? 'black' : 'white'
 
@@ -41,40 +58,81 @@ function App() {
 
     // Show notification
     setShowRandomizationNotice(true)
-    setTimeout(() => setShowRandomizationNotice(false), 2500)
-  }, [])
+    setTimeout(() => setShowRandomizationNotice(false), 3000)
+  }, [boardWinners])
 
   const handleTurnPairComplete = useCallback((boardId, move, gameStatus) => {
     console.log(`App: Turn pair complete on Board ${boardId}`)
     setMoveHistory((prev) => [...prev, { boardId, move }])
 
-    // Check if checkmate occurred - ends entire game
-    if (gameStatus === 'white_wins' || gameStatus === 'black_wins') {
-      const winningColor = gameStatus === 'white_wins' ? 'white' : 'black'
-      const didHumanWin = winningColor === humanColor
-      console.log(`GAME OVER: ${winningColor} wins! Winner: ${didHumanWin ? 'HUMAN' : 'AI'}`)
-      setGameOver(true)
-      setWinner(didHumanWin ? 'human' : 'ai')
-      return
-    }
+    const boardIndex = boardId - 1 // Convert 1-based to 0-based
 
-    // Check for stalemate
-    if (gameStatus === 'stalemate') {
-      console.log(`GAME OVER: Stalemate`)
-      setGameOver(true)
-      setWinner('draw')
-      return
+    // Check if this board just finished (checkmate or stalemate)
+    if (gameStatus === 'white_wins' || gameStatus === 'black_wins' || gameStatus === 'stalemate') {
+      const boardWinner = gameStatus === 'white_wins' ? 'white' : gameStatus === 'black_wins' ? 'black' : 'draw'
+
+      // Only update if this board hasn't been won yet
+      setBoardWinners((prev) => {
+        if (prev[boardIndex] !== null) {
+          // Board already finished, don't update
+          return prev
+        }
+
+        const newWinners = [...prev]
+        newWinners[boardIndex] = boardWinner
+        console.log(`Board ${boardId} finished: ${boardWinner}`)
+
+        return newWinners
+      })
+
+      // Update win counters
+      if (gameStatus === 'white_wins') {
+        setWhiteWins((prev) => {
+          const newWhiteWins = prev + 1
+          console.log(`White wins: ${newWhiteWins}`)
+
+          // Check if white got 2 wins (game over)
+          if (newWhiteWins >= 2) {
+            const didHumanWin = humanColor === 'white'
+            console.log(`GAME OVER: White wins best-of-3! Winner: ${didHumanWin ? 'HUMAN' : 'AI'}`)
+            setTimeout(() => {
+              setGameOver(true)
+              setWinner(didHumanWin ? 'human' : 'ai')
+            }, 2000) // Give time to see the final board state
+          }
+
+          return newWhiteWins
+        })
+      } else if (gameStatus === 'black_wins') {
+        setBlackWins((prev) => {
+          const newBlackWins = prev + 1
+          console.log(`Black wins: ${newBlackWins}`)
+
+          // Check if black got 2 wins (game over)
+          if (newBlackWins >= 2) {
+            const didHumanWin = humanColor === 'black'
+            console.log(`GAME OVER: Black wins best-of-3! Winner: ${didHumanWin ? 'HUMAN' : 'AI'}`)
+            setTimeout(() => {
+              setGameOver(true)
+              setWinner(didHumanWin ? 'human' : 'ai')
+            }, 2000) // Give time to see the final board state
+          }
+
+          return newBlackWins
+        })
+      }
+      // Note: draws don't count as wins for either side
     }
 
     // Show turn pair complete message
     setTurnPairComplete(true)
-    console.log(`Pausing for 1.5 seconds before randomization...`)
+    console.log(`Pausing for 2 seconds before randomization...`)
 
-    // Add pause before switching boards (1.5 seconds)
+    // Add pause before switching boards (2 seconds for smoother experience)
     setTimeout(() => {
       setTurnPairComplete(false)
       pickRandomBoardAndSide()
-    }, 1500)
+    }, 2000)
   }, [pickRandomBoardAndSide, humanColor])
 
   const handleResetGame = useCallback(() => {
@@ -83,6 +141,9 @@ function App() {
     setMoveHistory([])
     setGameOver(false)
     setWinner(null)
+    setBoardWinners([null, null, null])
+    setWhiteWins(0)
+    setBlackWins(0)
     setGameKey((k) => k + 1) // Force remount of all boards
   }, [])
 
@@ -123,6 +184,14 @@ function App() {
                     <span className="info-value">Board {activeBoardIndex + 1}</span>
                   </div>
                   <div className="info-row">
+                    <span className="info-label">Score (Best of 3):</span>
+                    <span className="info-value">
+                      <span className="score-display">
+                        White: {whiteWins} | Black: {blackWins}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="info-row">
                     <span className="info-label">You are:</span>
                     <span className={`info-value color-${humanColor}`}>{humanColor.toUpperCase()}</span>
                   </div>
@@ -147,7 +216,12 @@ function App() {
               >
                 <div className="board-label">
                   Board {idx + 1}
-                  {idx === activeBoardIndex && !gameOver && (
+                  {boardWinners[idx] && (
+                    <span className={`winner-badge winner-${boardWinners[idx]}`}>
+                      {boardWinners[idx] === 'draw' ? 'DRAW' : `${boardWinners[idx].toUpperCase()} WON`}
+                    </span>
+                  )}
+                  {idx === activeBoardIndex && !gameOver && !boardWinners[idx] && (
                     <span className="active-badge">
                       ACTIVE - You are {humanColor}
                     </span>
@@ -157,7 +231,7 @@ function App() {
                   key={`${gameKey}-${idx}`}
                   boardId={idx + 1}
                   compact={true}
-                  isActive={idx === activeBoardIndex && !gameOver && !turnPairComplete}
+                  isActive={idx === activeBoardIndex && !gameOver && !turnPairComplete && boardWinners[idx] === null}
                   humanColor={humanColor}
                   onTurnPairComplete={handleTurnPairComplete}
                 />

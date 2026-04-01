@@ -58,7 +58,7 @@ const ChessBoard = ({ onMove, currentTurn, onGameStatusChange, compact = false, 
     setIsAIThinking(true);
 
     try {
-      const aiMove = await getAIMove(board, 3, 800, gameState); // depth 3, min 800ms delay
+      const aiMove = await getAIMove(board, 3, 1200, gameState); // depth 3, min 1200ms delay for better visibility
 
       if (aiMove) {
         const { from, to } = aiMove;
