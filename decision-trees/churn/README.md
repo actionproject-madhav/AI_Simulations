@@ -1,32 +1,29 @@
-# Telco Churn (Minimal Deliverable)
+We can use Chi-squared for caregorical and ANOVA for numerical.
+Based on this statistical test, tenure, monthly charges, totalCharges, senior citizens,contract, payment methods and online security are the important features. The rest of the features aren't statistically significant for the output hence we dropped them.
 
-This implementation is intentionally minimal and focused on your assignment requirements.
 
-## What it produces
+The dataset has far more churn customers than the non-churn customers; we use SMOTE to artificially generate more churn sampeles; we use treebased classifiers like XGBoost, Random Foresct Classifier, Decision Tree Classifier etc. I stacked the classifiers and achieved an accuracy of 0.8 with reasonable precision, recall and f1 score
 
-Only these **3 plots**:
-1. `plots/01_churn_fraction_by_contract.png`
-2. `plots/02_churn_fraction_by_seniorcitizen.png`
-3. `plots/03_confusion_matrix.png`
 
-Also produces:
-- `metrics.txt` (confusion matrix, precision, recall, CV summary)
-- `writeup.md` (short assignment writeup)
 
-## Dataset placement
 
-Put the Kaggle CSV at:
 
-`decision-trees/churn/data/WA_Fn-UseC_-Telco-Customer-Churn.csv`
+Combined all four of the models above into one "super model," using LightGBM as the final decision-maker. This stacked model achieved a Cross-Validation score of ~90.8% and an F1 Score of 83%.
 
-## Run
 
-```bash
-python3 churn_analysis.py
-```
 
-## Dependencies
 
-```bash
-pip3 install pandas scikit-learn matplotlib seaborn
-```
+
+
+
+
+
+
+
+
+
+Entropy INformation gain
+Huffman codes, string of bits, using a particular set of codes; decode
+Small dataset, split, calculate the entropy and infrmatoon gain
+
+Probabiluty distribution huffman codes out of that distribution
