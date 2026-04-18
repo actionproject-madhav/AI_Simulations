@@ -1,0 +1,30 @@
+ReLU Activation Research
+
+Why ReLU is preferred over sigmoid:
+
+1. No vanishing gradient problem
+   Sigmoid saturates at 0 and 1, making gradients tiny when |x| is large.
+   ReLU gradient is either 0 or 1, so it doesn't vanish for positive inputs.
+
+2. Faster computation
+   ReLU is just max(0, x). Sigmoid requires exponential calculation.
+
+3. Sparse activation
+   About half the neurons are off (output 0), creating sparse representations.
+   This seems to help networks learn better features.
+
+4. Empirical performance
+   Deep networks train faster and reach better accuracy with ReLU.
+
+
+Leaky ReLU
+
+Problem with basic ReLU: neurons can "die" if they always output 0.
+Once a neuron's weights push it negative, gradient is 0, so it never recovers.
+
+Leaky ReLU fixes this:
+  f(x) = x if x > 0
+  f(x) = αx if x ≤ 0     (where α is small, like 0.01)
+
+This gives a small gradient even for negative inputs, so neurons can recover.
+Trade-off: slightly more computation, but prevents dead neurons.
